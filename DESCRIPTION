@@ -1,0 +1,15 @@
+Package: gluedocking
+Title: Molecular Docking Automation Tools for Drug Discovery
+Version: 0.1.0
+Authors@R: 
+    person("Beihao", "Li", , "szright2000@gmail.com", role = c("aut", "cre"))
+Description: Provides a comprehensive set of tools to automate molecular docking workflows for drug discovery research. Facilitates the preparation, execution, and analysis of protein-ligand docking simulations using AutoDock Vina and related software. Functions include downloading protein structures from PDB database, retrieving ligands from PubChem, preparing receptors and ligands for docking, calculating optimal docking box parameters, generating configuration files, running docking simulations, and parsing results.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    httr,
+    bio3d,
+    tools,
+    utils
