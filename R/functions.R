@@ -577,30 +577,32 @@ prepare_ligand <- function(mol_files, out_dir = "./",
 #' Convert molecule file formats using OpenBabel
 #'
 #' This function converts molecular structure files between different formats
-#' using the OpenBabel chemical toolbox.
+#' using the OpenBabel chemical toolbox. It supports converting a single file,
+#' multiple files, or all files in a directory.
 #'
-#' @param input_file Character, path to the input molecule file
+#' @param input_file Character, path to the input molecule file, or a character vector of file paths,
+#'                   or a directory containing molecule files to convert
 #' @param input_format Character, format of the input file, default NULL (auto-detect from file extension)
 #' @param output_file Character, path to the output file, default NULL (auto-generate based on input file name)
 #' @param output_format Character, format for the output file, default NULL (auto-detect from output file extension)
+#' @param output_dir Character, directory to save output files, default converted
+#' @param pattern Character, file pattern to match when input_file is a directory, default NULL (all files)
+#' @param recursive Logical, whether to search recursively in directories, default FALSE
 #' @param obabel_path Character, path to OpenBabel executable, default NULL (uses GLUEDOCK_OBABEL_PATH environment variable)
 #'
-#' @return Character, path to the successfully converted file, or NULL if conversion failed
+#' @return Character vector of paths to successfully converted files, or NULL if conversion failed
 #' @importFrom tools file_path_sans_ext file_ext
 #' @examples
 #' \dontrun{
-#' # Convert SDF to PDB
+#' # Convert a single file
 #' convert_molecule("ligand.sdf", output_format = "mol2")
 #' }
 #'
 #' @export
 convert_molecule <- function(input_file, input_format = NULL,
                              output_file = NULL, output_format = NULL,
+                             output_dir = "converted", pattern = NULL, recursive = FALSE,
                              obabel_path = NULL) {
-
-  if (!file.exists(input_file)) {
-    stop("Input file does not exist: ", input_file)
-  }
 
   if (is.null(obabel_path)) {
     obabel_path <- Sys.getenv("GLUEDOCK_OBABEL_PATH", unset = NA)
@@ -608,68 +610,130 @@ convert_molecule <- function(input_file, input_format = NULL,
       stop("obabel_path parameter is required and GLUEDOCK_OBABEL_PATH environment variable not set. Please provide obabel_path parameter or set GLUEDOCK_OBABEL_PATH environment variable.")
     }
   }
-  file_name <- tools::file_path_sans_ext(basename(input_file))
-  input_ext <- tools::file_ext(input_file)
 
-  if (is.null(input_format)) {
-    input_format <- input_ext
-    message(sprintf("Input format not specified, using file extension: %s", input_format))
-  }
-
-  if (is.null(output_format)) {
-    if (is.null(output_file)) {
-      stop("Either output_file or output_format must be specified")
-    }
-    output_format <- tools::file_ext(output_file)
-    message(sprintf("Output format not specified, using file extension: %s", output_format))
-  }
-
-  if (is.null(output_file)) {
-    output_file <- paste0(file_name, ".", output_format)
-    message(sprintf("Output file not specified, using: %s", output_file))
-  }
-
-  output_dir <- dirname(output_file)
-  if (!dir.exists(output_dir) && output_dir != ".") {
-    dir.create(output_dir, recursive = TRUE)
-  }
-
-  obabel_cmd <- obabel_path
-  if (!file.exists(obabel_cmd)) {
+  if (!file.exists(obabel_path)) {
     stop("OpenBabel executable not found: ", obabel_path)
   }
 
-  args <- c(
-    shQuote(input_file),
-    "-i", input_format,
-    "-o", output_format,
-    "-O", shQuote(output_file)
-  )
-
-  message("Running:\n  ", obabel_cmd, " ", paste(args, collapse = " "))
-
-  res <- suppressWarnings(
-    system2(
-      command = obabel_cmd,
-      args = args,
-      stdout = TRUE,
-      stderr = TRUE
+  if (length(input_file) == 1 && dir.exists(input_file)) {
+    files_to_convert <- list.files(
+      path = input_file,
+      pattern = pattern,
+      full.names = TRUE,
+      recursive = recursive
     )
-  )
 
-  if (length(res) > 0) {
-    message(paste(res, collapse = "\n"))
+    if (length(files_to_convert) == 0) {
+      warning("No files found in directory: ", input_file)
+      return(NULL)
+    }
+
+    message(sprintf("Found %d files to convert in directory: %s", length(files_to_convert), input_file))
+  } else {
+    files_to_convert <- input_file
+
+    missing_files <- files_to_convert[!file.exists(files_to_convert)]
+    if (length(missing_files) > 0) {
+      warning("The following input files do not exist: ", paste(missing_files, collapse = ", "))
+      files_to_convert <- files_to_convert[file.exists(files_to_convert)]
+
+      if (length(files_to_convert) == 0) {
+        stop("No valid input files to convert")
+      }
+    }
   }
 
-  if (!file.exists(output_file)) {
-    warning(sprintf("Conversion failed: output file not created: %s", output_file))
+  if (!is.null(output_dir)) {
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
+      message(sprintf("Created output directory: %s", output_dir))
+    }
+  }
+
+  converted_files <- character(0)
+
+  for (file_path in files_to_convert) {
+    file_name <- tools::file_path_sans_ext(basename(file_path))
+    file_ext <- tools::file_ext(file_path)
+
+    current_input_format <- input_format
+    if (is.null(current_input_format)) {
+      current_input_format <- file_ext
+      message(sprintf("Input format not specified for %s, using file extension: %s", basename(file_path), current_input_format))
+    }
+
+    current_output_format <- output_format
+    current_output_file <- output_file
+
+    if (is.null(current_output_format)) {
+      if (is.null(current_output_file)) {
+        stop("Either output_file or output_format must be specified")
+      }
+      current_output_format <- tools::file_ext(current_output_file)
+      message(sprintf("Output format not specified for %s, using file extension: %s", basename(file_path), current_output_format))
+    }
+
+    if (is.null(current_output_file)) {
+      if (is.null(output_dir)) {
+        current_output_file <- paste0(file_name, ".", current_output_format)
+      } else {
+        current_output_file <- file.path(output_dir, paste0(file_name, ".", current_output_format))
+      }
+      message(sprintf("Output file not specified for %s, using: %s", basename(file_path), current_output_file))
+    }
+
+    output_file_dir <- dirname(current_output_file)
+    if (!dir.exists(output_file_dir) && output_file_dir != ".") {
+      dir.create(output_file_dir, recursive = TRUE)
+    }
+
+    args <- c(
+      shQuote(file_path),
+      "-i", current_input_format,
+      "-o", current_output_format,
+      "-O", shQuote(current_output_file)
+    )
+
+    message(sprintf("Converting %s to %s", basename(file_path), basename(current_output_file)))
+    message("Running:\n  ", obabel_path, " ", paste(args, collapse = " "))
+
+    res <- suppressWarnings(
+      system2(
+        command = obabel_path,
+        args = args,
+        stdout = TRUE,
+        stderr = TRUE
+      )
+    )
+
+    if (length(res) > 0) {
+      message(paste(res, collapse = "\n"))
+    }
+
+    if (!file.exists(current_output_file)) {
+      warning(sprintf("Conversion failed for %s: output file not created: %s", basename(file_path), current_output_file))
+    } else {
+      message(sprintf("Successfully converted %s to %s", basename(file_path), current_output_file))
+      converted_files <- c(converted_files, current_output_file)
+    }
+  }
+
+  total <- length(files_to_convert)
+  success <- length(converted_files)
+  failed <- total - success
+
+  if (failed > 0) {
+    message(sprintf("Total: %d files, Success: %d, Failed: %d", total, success, failed))
+  } else {
+    message(sprintf("Successfully converted all %d files", success))
+  }
+
+  if (success > 0) {
+    return(converted_files)
+  } else {
     return(NULL)
   }
-
-  message(sprintf("Successfully converted %s to %s", input_file, output_file))
-  return(output_file)
 }
-
 
 #' Calculate docking box parameters from PDB structures
 #'

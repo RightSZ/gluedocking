@@ -9,11 +9,15 @@ convert_molecule(
   input_format = NULL,
   output_file = NULL,
   output_format = NULL,
+  output_dir = "converted",
+  pattern = NULL,
+  recursive = FALSE,
   obabel_path = NULL
 )
 }
 \arguments{
-\item{input_file}{Character, path to the input molecule file}
+\item{input_file}{Character, path to the input molecule file, or a character vector of file paths,
+or a directory containing molecule files to convert}
 
 \item{input_format}{Character, format of the input file, default NULL (auto-detect from file extension)}
 
@@ -21,18 +25,25 @@ convert_molecule(
 
 \item{output_format}{Character, format for the output file, default NULL (auto-detect from output file extension)}
 
+\item{output_dir}{Character, directory to save output files, default converted}
+
+\item{pattern}{Character, file pattern to match when input_file is a directory, default NULL (all files)}
+
+\item{recursive}{Logical, whether to search recursively in directories, default FALSE}
+
 \item{obabel_path}{Character, path to OpenBabel executable, default NULL (uses GLUEDOCK_OBABEL_PATH environment variable)}
 }
 \value{
-Character, path to the successfully converted file, or NULL if conversion failed
+Character vector of paths to successfully converted files, or NULL if conversion failed
 }
 \description{
 This function converts molecular structure files between different formats
-using the OpenBabel chemical toolbox.
+using the OpenBabel chemical toolbox. It supports converting a single file,
+multiple files, or all files in a directory.
 }
 \examples{
 \dontrun{
-# Convert SDF to PDB
+# Convert a single file
 convert_molecule("ligand.sdf", output_format = "mol2")
 }
 

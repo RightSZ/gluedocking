@@ -32,13 +32,25 @@ Before using gluedocking, you need to configure the environment by specifying th
 
 ``` r
 library(gluedocking)
-
 prepare_for_gluedocking(
-  python_path = "/path/to/python",
-  prepare_receptor_script = "/path/to/MGLTools/scripts/prepare_receptor4.py",
-  prepare_ligand_script = "/path/to/MGLTools/scripts/prepare_ligand4.py",
-  obabel_path = "/path/to/openbabel/bin/obabel",
-  vina_path = "/path/to/autodock_vina/vina"
+  python_path = "/your_path/python.exe",
+  prepare_receptor_script = "/your_path/prepare_receptor4.py",
+  prepare_ligand_script = "/your_path/prepare_ligand4.py",
+  obabel_path = "/your_path/obabel.exe",
+  vina_path = "/your_path/qvinaw.exe"
+)
+```
+Alternatively, you can use the `file4gluedocking` package to get the paths:
+```r 
+# Install file4gluedocking from GitHub
+devtools::install_github("RightSZ/file4gluedocking")
+library(file4gluedocking)
+prepare_for_gluedocking(
+  python_path = get_python_path(),
+  prepare_receptor_script = get_prepare_receptor_path(),
+  prepare_ligand_script = get_prepare_ligand_path(),
+  obabel_path = get_obabel_path(),
+  vina_path = get_qvinaw_path()
 )
 ```
 
