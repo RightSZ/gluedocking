@@ -13,5 +13,8 @@ collect_pdb_files(inputs)
 Character vector of PDB file paths
 }
 \description{
-Collect PDB files from input paths
+This internal function scans the provided inputs and collects all PDB files.
+It handles both individual files and directories, recursively finding all
+files with .pdb extension.
 }
+\keyword{internal}
