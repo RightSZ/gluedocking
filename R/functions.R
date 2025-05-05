@@ -1,176 +1,3 @@
-#' Configure environment for GlueDocking
-#'
-#' This function sets up the necessary environment variables for GlueDocking by checking
-#' and storing paths to required external tools in the R environment file.
-#'
-#' @param python_path Character, path to Python executable
-#' @param prepare_receptor_script Character, path to prepare_receptor4.py script
-#' @param prepare_ligand_script Character, path to prepare_ligand4.py script
-#' @param obabel_path Character, path to OpenBabel executable
-#' @param vina_path Character, path to AutoDock Vina executable
-#' @param force Logical, whether to overwrite existing environment variables, default FALSE
-#'
-#' @return Invisibly returns TRUE if setup was successful
-#' @importFrom utils file.edit
-#' @importFrom tools file_path_sans_ext file_ext
-#' @examples
-#' \dontrun{
-#' prepare_for_gluedocking(
-#'   python_path = "C:/Python39/python.exe",
-#'   prepare_receptor_script = "C:/MGLTools/scripts/prepare_receptor4.py",
-#'   prepare_ligand_script = "C:/MGLTools/scripts/prepare_ligand4.py",
-#'   obabel_path = "C:/OpenBabel/bin/obabel.exe",
-#'   vina_path = "C:/AutoDock_Vina/vina.exe"
-#' )
-#' }
-#'
-#' @export
-prepare_for_gluedocking <- function(python_path = NULL,
-                                    prepare_receptor_script = NULL,
-                                    prepare_ligand_script = NULL,
-                                    obabel_path = NULL,
-                                    vina_path = NULL,
-                                    force = FALSE) {
-
-  # Check if files exist
-  check_file_exists <- function(path, name) {
-    if (!is.null(path)) {
-      if (!file.exists(path)) {
-        warning(sprintf("The specified %s file does not exist: %s", name, path))
-        return(FALSE)
-      }
-      return(TRUE)
-    }
-    return(NA)
-  }
-
-  # Check each path
-  python_exists <- check_file_exists(python_path, "Python executable")
-  receptor_script_exists <- check_file_exists(prepare_receptor_script, "prepare_receptor4.py script")
-  ligand_script_exists <- check_file_exists(prepare_ligand_script, "prepare_ligand4.py script")
-  obabel_exists <- check_file_exists(obabel_path, "OpenBabel executable")
-  vina_exists <- check_file_exists(vina_path, "AutoDock Vina executable")
-
-  # Get current R environment variables
-  env_vars <- Sys.getenv()
-
-  # Check if environment variables already exist
-  env_python <- Sys.getenv("GLUEDOCK_PYTHON_PATH", unset = NA)
-  env_receptor <- Sys.getenv("GLUEDOCK_PREPARE_RECEPTOR", unset = NA)
-  env_ligand <- Sys.getenv("GLUEDOCK_PREPARE_LIGAND", unset = NA)
-  env_obabel <- Sys.getenv("GLUEDOCK_OBABEL_PATH", unset = NA)
-  env_vina <- Sys.getenv("GLUEDOCK_VINA_PATH", unset = NA)
-
-  # Prepare variables to write
-  vars_to_write <- character()
-
-  # Check Python path
-  if (!is.null(python_path)) {
-    if (!is.na(env_python)) {
-      message(sprintf("GLUEDOCK_PYTHON_PATH already exists in R environment: %s", env_python))
-      if (force && python_exists) {
-        vars_to_write <- c(vars_to_write, sprintf('GLUEDOCK_PYTHON_PATH="%s"', python_path))
-        message("Will overwrite existing Python path")
-      }
-    } else if (python_exists) {
-      vars_to_write <- c(vars_to_write, sprintf('GLUEDOCK_PYTHON_PATH="%s"', python_path))
-    }
-  }
-
-  # Check receptor script path
-  if (!is.null(prepare_receptor_script)) {
-    if (!is.na(env_receptor)) {
-      message(sprintf("GLUEDOCK_PREPARE_RECEPTOR already exists in R environment: %s", env_receptor))
-      if (force && receptor_script_exists) {
-        vars_to_write <- c(vars_to_write, sprintf('GLUEDOCK_PREPARE_RECEPTOR="%s"', prepare_receptor_script))
-        message("Will overwrite existing receptor script path")
-      }
-    } else if (receptor_script_exists) {
-      vars_to_write <- c(vars_to_write, sprintf('GLUEDOCK_PREPARE_RECEPTOR="%s"', prepare_receptor_script))
-    }
-  }
-
-  # Check ligand script path
-  if (!is.null(prepare_ligand_script)) {
-    if (!is.na(env_ligand)) {
-      message(sprintf("GLUEDOCK_PREPARE_LIGAND already exists in R environment: %s", env_ligand))
-      if (force && ligand_script_exists) {
-        vars_to_write <- c(vars_to_write, sprintf('GLUEDOCK_PREPARE_LIGAND="%s"', prepare_ligand_script))
-        message("Will overwrite existing ligand script path")
-      }
-    } else if (ligand_script_exists) {
-      vars_to_write <- c(vars_to_write, sprintf('GLUEDOCK_PREPARE_LIGAND="%s"', prepare_ligand_script))
-    }
-  }
-
-  # Check OpenBabel path
-  if (!is.null(obabel_path)) {
-    if (!is.na(env_obabel)) {
-      message(sprintf("GLUEDOCK_OBABEL_PATH already exists in R environment: %s", env_obabel))
-      if (force && obabel_exists) {
-        vars_to_write <- c(vars_to_write, sprintf('GLUEDOCK_OBABEL_PATH="%s"', obabel_path))
-        message("Will overwrite existing OpenBabel path")
-      }
-    } else if (obabel_exists) {
-      vars_to_write <- c(vars_to_write, sprintf('GLUEDOCK_OBABEL_PATH="%s"', obabel_path))
-    }
-  }
-
-  # Check Vina path
-  if (!is.null(vina_path)) {
-    if (!is.na(env_vina)) {
-      message(sprintf("GLUEDOCK_VINA_PATH already exists in R environment: %s", env_vina))
-      if (force && vina_exists) {
-        vars_to_write <- c(vars_to_write, sprintf('GLUEDOCK_VINA_PATH="%s"', vina_path))
-        message("Will overwrite existing Vina path")
-      }
-    } else if (vina_exists) {
-      vars_to_write <- c(vars_to_write, sprintf('GLUEDOCK_VINA_PATH="%s"', vina_path))
-    }
-  }
-
-  # If there are variables to write, write them to R environment file
-  if (length(vars_to_write) > 0) {
-    message("The following environment variables will be written to R environment file:")
-    message(paste(vars_to_write, collapse = "\n"))
-
-    # Get path to .Renviron file
-    renviron_path <- file.path(Sys.getenv("HOME"), ".Renviron")
-
-    # Read existing content if file exists
-    if (file.exists(renviron_path)) {
-      existing_content <- readLines(renviron_path, warn = FALSE)
-    } else {
-      existing_content <- character()
-    }
-
-    # Process each variable to write
-    for (var_entry in vars_to_write) {
-      var_name <- sub("=.*", "", var_entry)
-
-      # Check if variable already exists in file
-      existing_idx <- grep(paste0("^", var_name, "="), existing_content)
-
-      if (length(existing_idx) > 0) {
-        # Replace existing entry
-        existing_content[existing_idx[1]] <- var_entry
-        message(sprintf("Updated existing entry for %s", var_name))
-      } else {
-        # Add new entry
-        existing_content <- c(existing_content, var_entry)
-        message(sprintf("Added new entry for %s", var_name))
-      }
-    }
-
-    # Write back to .Renviron file
-    writeLines(existing_content, renviron_path)
-    message(sprintf("Environment variables written to %s", renviron_path))
-    message("Please restart R session to apply the environment variables")
-  } else {
-    message("No new environment variables to add")
-  }
-  invisible(TRUE)
-}
 
 #' Download PDB files from RCSB PDB database
 #'
@@ -270,7 +97,7 @@ download_receptor <- function(pdb_ids, out_dir = "./", verify_ssl = TRUE) {
 prepare_receptor <- function(pdb_files, out_dir = "./",
                              python_path = NULL,
                              prepare_script = NULL,
-                             add_opts = "-A hydrogens -e True") {
+                             add_opts = "-A hydrogens") {
 
   if (length(pdb_files) == 0) {
     stop("No PDB files provided")
@@ -496,21 +323,49 @@ prepare_ligand <- function(mol_files, out_dir = "./",
     stop("Specified prepare_script does not exist: ", prepare_script)
   }
 
+  original_wd <- getwd()
+  on.exit(setwd(original_wd), add = TRUE)
+  is_absolute_path <- function(path) {
+    # On Unix/Mac, absolute paths start with "/"
+    # On Windows, they start with a drive letter followed by ":" or with "\\"
+    grepl("^(/|[A-Za-z]:|\\\\\\\\)", path)
+  }
+
   process_one <- function(mol_file) {
     if (!file.exists(mol_file)) {
       warning(sprintf("Input molecule file does not exist: %s", mol_file))
       return(NULL)
     }
 
-    base_name <- tools::file_path_sans_ext(basename(mol_file))
+    mol_dir <- dirname(mol_file)
+    mol_basename <- basename(mol_file)
+    base_name <- tools::file_path_sans_ext(mol_basename)
+
+
+    message(sprintf("Changing to directory: %s", mol_dir))
+    setwd(mol_dir)
+
 
     if (is.null(out_dir)) {
       output_pdbqt <- paste0(base_name, ".pdbqt")
+      abs_output_pdbqt <- file.path(mol_dir, output_pdbqt)
     } else {
-      output_pdbqt <- file.path(out_dir, paste0(base_name, ".pdbqt"))
+
+      if (!is_absolute_path(out_dir)) {
+        abs_out_dir <- file.path(original_wd, out_dir)
+      } else {
+        abs_out_dir <- out_dir
+      }
+
+      if (!dir.exists(abs_out_dir)) {
+        dir.create(abs_out_dir, recursive = TRUE)
+      }
+
+      output_pdbqt <- paste0(base_name, ".pdbqt")
+      abs_output_pdbqt <- file.path(abs_out_dir, output_pdbqt)
     }
 
-    tool_path <- normalizePath(prepare_script, winslash = "\\", mustWork = FALSE)
+    tool_path <- normalizePath(prepare_script, winslash = "/", mustWork = FALSE)
 
     if (is.null(python_path)) {
       python_path <- Sys.getenv("GLUEDOCK_PYTHON_PATH", unset = NA)
@@ -519,17 +374,18 @@ prepare_ligand <- function(mol_files, out_dir = "./",
       }
     }
 
-    py_path <- normalizePath(python_path, winslash = "\\", mustWork = FALSE)
+    py_path <- normalizePath(python_path, winslash = "/", mustWork = FALSE)
 
     if (!file.exists(py_path)) {
       warning(sprintf("Python executable not found: %s", python_path))
       return(NULL)
     }
 
+    # Use the local filename since we're in the file's directory
     args <- c(
       shQuote(tool_path),
-      "-l", shQuote(mol_file),
-      "-o", shQuote(output_pdbqt),
+      "-l", shQuote(mol_basename),
+      "-o", shQuote(abs_output_pdbqt),
       add_opts
     )
 
@@ -548,13 +404,15 @@ prepare_ligand <- function(mol_files, out_dir = "./",
 
     if (length(res_clean)) message(paste(res_clean, collapse = "\n"))
 
-    if (!file.exists(output_pdbqt)) {
+    setwd(original_wd)
+
+    if (!file.exists(abs_output_pdbqt)) {
       warning(sprintf("PDBQT not generated, please check output messages for file: %s", mol_file))
       return(NULL)
     }
 
-    message(sprintf("Successfully prepared ligand: %s", output_pdbqt))
-    return(output_pdbqt)
+    message(sprintf("Successfully prepared ligand: %s", abs_output_pdbqt))
+    return(abs_output_pdbqt)
   }
 
   out_files <- lapply(mol_files, process_one)
@@ -573,6 +431,7 @@ prepare_ligand <- function(mol_files, out_dir = "./",
 
   return(unlist(valid_files))
 }
+
 
 #' Convert molecule file formats using OpenBabel
 #'

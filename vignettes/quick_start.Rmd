@@ -40,19 +40,6 @@ prepare_for_gluedocking(
   vina_path = "/your_path/qvinaw.exe"
 )
 ```
-Alternatively, you can use the `file4gluedocking` package to get the paths:
-```r 
-# Install file4gluedocking from GitHub
-devtools::install_github("RightSZ/file4gluedocking")
-library(file4gluedocking)
-prepare_for_gluedocking(
-  python_path = get_python_path(),
-  prepare_receptor_script = get_prepare_receptor_path(),
-  prepare_ligand_script = get_prepare_ligand_path(),
-  obabel_path = get_obabel_path(),
-  vina_path = get_qvinaw_path()
-)
-```
 
 This will store the paths in your R environment file, so you only need to run this once.
 
@@ -60,75 +47,131 @@ This will store the paths in your R environment file, so you only need to run th
 
 ### 1. Download Receptor Structures
 
+First, we need to obtain the receptor (protein) structures. The `download_receptor` function retrieves PDB files from the RCSB Protein Data Bank.
+
 ``` r
 # Download PDB files from RCSB PDB database
 pdb_files <- download_receptor(c("1iep", "4hg7"), out_dir = "receptors")
 ```
 
+This step downloads the 3D structures of proteins that will serve as receptors (targets) for our docking experiments. The PDB files contain atomic coordinates of the protein structures determined by experimental methods like X-ray crystallography or NMR.
+
 ### 2. Download Ligand Structures
+
+Next, we need small molecules (ligands) to dock into our receptors. The `download_ligand` function retrieves chemical structures from PubChem.
 
 ``` r
 # Download ligand structures from PubChem
 ligand_files <- download_ligand(c("2244", "5090"), out_dir = "ligands")
 ```
 
+This step obtains the 3D structures of small molecules that will be docked into the binding sites of our receptor proteins. These compounds are potential drug candidates or known drugs that we want to study for their binding interactions.
+
 ### 3. Prepare Receptor Files
 
+Raw PDB files often contain elements that need to be removed or modified before docking. We'll process them in several steps:
+
 ``` r
-# Convert PDB files to PDBQT format for docking
+# Step 1: Remove non-protein atoms (water, ligands, etc.)
+trim_receptor("./receptors/", output_dir = "trimmed")
+
+# Step 2: Split alternate conformations (if present)
+split_alt(
+  inputs = trimmed_files,
+  out_dir = "split_alt",
+  keep_label = "A"  # Keep only the "A" conformation
+)
+pbd_files<-paste0("./split_alt/",dir("./split_alt/"))
+
+# Step 3: Convert PDB files to PDBQT format for docking
 receptor_pdbqt <- prepare_receptor(
-  pdb_files,
+  pbd_files,
   out_dir = "prepared_receptors"
 )
 ```
 
+These steps prepare the receptor structures for docking:
+
+-   trim_receptor removes non-protein atoms like water molecules, ions, and co-crystallized ligands
+-   split_alt handles alternate conformations of amino acid side chains, keeping only the primary (A) conformation
+-   prepare_receptor converts the cleaned PDB files to PDBQT format, adding partial charges and atom types required by AutoDock Vina
+
 ### 4. Prepare Ligand Files
-#### File Format Conversion
+
+Ligands also need to be prepared for docking:
+
 ``` r
-# Convert SDF to MOL2
-converted_files<-convert_molecule(
-  input_file = "receptors",
-  output_format = "mol2"
+# Step 1: Convert SDF files to MOL2 format
+converted_files <- convert_molecule(
+  input_file = "./ligands/",
+  output_format = "mol2",
+  output_dir = "./ligands_mol2/"
 )
 
-# Convert ligand files to PDBQT format for docking
+# Step 2: Convert ligand files to PDBQT format for docking
 ligand_pdbqt <- prepare_ligand(
   converted_files,
   out_dir = "prepared_ligands"
 )
 ```
 
+These steps prepare the ligand structures:
+
+-   convert_molecule converts the downloaded structures to MOL2 format using OpenBabel
+-   prepare_ligand converts the MOL2 files to PDBQT format, adding partial charges, atom types, and setting up rotatable bonds
+
 ### 5. Calculate Docking Box Parameters
+
+Before docking, we need to define the search space (docking box) where the ligand will be positioned:
 
 ``` r
 # Determine appropriate docking box dimensions and center coordinates
-box_params <- calculate_box(pdb_files, padding = 5)
+box_params <- calculate_box(split_files, padding = 5)
+print(box_params)
 ```
+
+This step analyzes the receptor structures to determine the optimal dimensions and center coordinates for the docking box. The padding parameter adds extra space around the protein to ensure the entire binding site is included in the search space.
 
 ### 6. Generate Configuration Files
 
+Now we'll create configuration files for AutoDock Vina:
+
 ``` r
-# Create configuration files for docking
+# Create configuration files for each receptor-ligand pair
 config_files <- write_configs(
   receptor_paths = receptor_pdbqt,
   ligand_paths = ligand_pdbqt,
   box_df = box_params,
-  out_dir = "configs"
+  out_dir = "configs",
+  exhaustiveness = 8,  # Search thoroughness
 )
 ```
+
+This step generates configuration files that specify all parameters for the docking runs, including:
+
+-   Paths to receptor and ligand files
+-   Docking box center and dimensions
+-   Search exhaustiveness (higher values give more thorough but slower searches)
 
 ### 7. Run Docking
 
+Now we're ready to perform the actual docking simulations:
+
 ``` r
 # Run molecular docking using AutoDock Vina
-run_vina(
+results <- run_vina(
   config_paths = "configs",
-  out = "docked",
-  logs = "logs"
+  out_dir = "docked",
+  log_dir = "logs",
+  cpu = 4  # Use 4 CPU cores
 )
 ```
 
+This step executes AutoDock Vina to perform the docking simulations for all receptor-ligand pairs. The docking algorithm searches for optimal binding poses and scores them based on estimated binding affinity. Using multiple CPU cores can significantly speed up the process.
+
 ### 8. Check and Rerun Failed Docking Jobs
+
+Sometimes docking jobs may fail, so we can check and rerun them:
 
 ``` r
 # Check log files and rerun any failed docking jobs
@@ -139,15 +182,29 @@ check_logs(
 )
 ```
 
+This step examines the log files to identify any failed docking runs and automatically reruns them. This ensures that all receptor-ligand pairs are successfully processed.
+
 ### 9. Parse Docking Results
+
+Finally, we'll analyze the docking results:
 
 ``` r
 # Parse all log files and combine results
-results <- parse_logs(log_folder = "logs")
+results_df <- parse_logs(log_dir = "logs")
 
-# View top binding poses
-head(results[order(results$affinity_kcalmol), ])
+# View top binding poses sorted by binding affinity
+top_results <- head(results_df[order(results_df$affinity_kcalmol), ])
+print(top_results)
+
+# Save results to CSV file
+write.csv(results_df, "docking_results.csv", row.names = FALSE)
 ```
+
+This step extracts and organizes the docking results from all log files, including:
+
+-   Binding affinities (lower values indicate stronger binding)
+-   Receptor and ligand identifiers
+-   Ranking of binding poses
 
 ### Direct Docking Mode
 

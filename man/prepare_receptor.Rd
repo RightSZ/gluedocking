@@ -9,7 +9,7 @@ prepare_receptor(
   out_dir = "./",
   python_path = NULL,
   prepare_script = NULL,
-  add_opts = "-A hydrogens -e True"
+  add_opts = "-A hydrogens"
 )
 }
 \arguments{

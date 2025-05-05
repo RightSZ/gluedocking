@@ -8,16 +8,22 @@
 <url><loc>https://rightsz.github.io/xvm/index.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/calculate_box.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/check_logs.html</loc></url>
+<url><loc>https://rightsz.github.io/xvm/reference/collect_pdb_files.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/convert_molecule.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/download_ligand.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/download_receptor.html</loc></url>
+<url><loc>https://rightsz.github.io/xvm/reference/has_alternate_locations.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/index.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/parse_logs.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/parse_qvina_log.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/prepare_for_gluedocking.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/prepare_ligand.html</loc></url>
+<url><loc>https://rightsz.github.io/xvm/reference/prepare_ligand2.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/prepare_receptor.html</loc></url>
+<url><loc>https://rightsz.github.io/xvm/reference/process_pdb_files.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/run_vina.html</loc></url>
+<url><loc>https://rightsz.github.io/xvm/reference/split_pdb_with_script.html</loc></url>
+<url><loc>https://rightsz.github.io/xvm/reference/trim_receptor.html</loc></url>
 <url><loc>https://rightsz.github.io/xvm/reference/write_configs.html</loc></url>
 </urlset>
 

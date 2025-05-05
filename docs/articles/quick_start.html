@@ -84,19 +84,6 @@ specifying the paths to the required external tools:</p>
 <span>  obabel_path <span class="op">=</span> <span class="st">"/your_path/obabel.exe"</span>,</span>
 <span>  vina_path <span class="op">=</span> <span class="st">"/your_path/qvinaw.exe"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Alternatively, you can use the <code>file4gluedocking</code> package
-to get the paths:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install file4gluedocking from GitHub</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"RightSZ/file4gluedocking"</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">file4gluedocking</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/prepare_for_gluedocking.html">prepare_for_gluedocking</a></span><span class="op">(</span></span>
-<span>  python_path <span class="op">=</span> <span class="fu">get_python_path</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  prepare_receptor_script <span class="op">=</span> <span class="fu">get_prepare_receptor_path</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  prepare_ligand_script <span class="op">=</span> <span class="fu">get_prepare_ligand_path</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  obabel_path <span class="op">=</span> <span class="fu">get_obabel_path</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  vina_path <span class="op">=</span> <span class="fu">get_qvinaw_path</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
 <p>This will store the paths in your R environment file, so you only
 need to run this once.</p>
 </div>
@@ -106,103 +93,184 @@ need to run this once.</p>
 <div class="section level3">
 <h3 id="download-receptor-structures">1. Download Receptor Structures<a class="anchor" aria-label="anchor" href="#download-receptor-structures"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>First, we need to obtain the receptor (protein) structures. The
+<code>download_receptor</code> function retrieves PDB files from the
+RCSB Protein Data Bank.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download PDB files from RCSB PDB database</span></span>
 <span><span class="va">pdb_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_receptor.html">download_receptor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1iep"</span>, <span class="st">"4hg7"</span><span class="op">)</span>, out_dir <span class="op">=</span> <span class="st">"receptors"</span><span class="op">)</span></span></code></pre></div>
+<p>This step downloads the 3D structures of proteins that will serve as
+receptors (targets) for our docking experiments. The PDB files contain
+atomic coordinates of the protein structures determined by experimental
+methods like X-ray crystallography or NMR.</p>
 </div>
 <div class="section level3">
 <h3 id="download-ligand-structures">2. Download Ligand Structures<a class="anchor" aria-label="anchor" href="#download-ligand-structures"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>Next, we need small molecules (ligands) to dock into our receptors.
+The <code>download_ligand</code> function retrieves chemical structures
+from PubChem.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download ligand structures from PubChem</span></span>
 <span><span class="va">ligand_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_ligand.html">download_ligand</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2244"</span>, <span class="st">"5090"</span><span class="op">)</span>, out_dir <span class="op">=</span> <span class="st">"ligands"</span><span class="op">)</span></span></code></pre></div>
+<p>This step obtains the 3D structures of small molecules that will be
+docked into the binding sites of our receptor proteins. These compounds
+are potential drug candidates or known drugs that we want to study for
+their binding interactions.</p>
 </div>
 <div class="section level3">
 <h3 id="prepare-receptor-files">3. Prepare Receptor Files<a class="anchor" aria-label="anchor" href="#prepare-receptor-files"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Convert PDB files to PDBQT format for docking</span></span>
+<p>Raw PDB files often contain elements that need to be removed or
+modified before docking. We’ll process them in several steps:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Step 1: Remove non-protein atoms (water, ligands, etc.)</span></span>
+<span><span class="fu"><a href="../reference/trim_receptor.html">trim_receptor</a></span><span class="op">(</span><span class="st">"./receptors/"</span>, output_dir <span class="op">=</span> <span class="st">"trimmed"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Step 2: Split alternate conformations (if present)</span></span>
+<span><span class="fu">split_alt</span><span class="op">(</span></span>
+<span>  inputs <span class="op">=</span> <span class="va">trimmed_files</span>,</span>
+<span>  out_dir <span class="op">=</span> <span class="st">"split_alt"</span>,</span>
+<span>  keep_label <span class="op">=</span> <span class="st">"A"</span>  <span class="co"># Keep only the "A" conformation</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">pbd_files</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"./split_alt/"</span>,<span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="st">"./split_alt/"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Step 3: Convert PDB files to PDBQT format for docking</span></span>
 <span><span class="va">receptor_pdbqt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prepare_receptor.html">prepare_receptor</a></span><span class="op">(</span></span>
-<span>  <span class="va">pdb_files</span>,</span>
+<span>  <span class="va">pbd_files</span>,</span>
 <span>  out_dir <span class="op">=</span> <span class="st">"prepared_receptors"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<p>These steps prepare the receptor structures for docking:</p>
+<ul>
+<li>trim_receptor removes non-protein atoms like water molecules, ions,
+and co-crystallized ligands</li>
+<li>split_alt handles alternate conformations of amino acid side chains,
+keeping only the primary (A) conformation</li>
+<li>prepare_receptor converts the cleaned PDB files to PDBQT format,
+adding partial charges and atom types required by AutoDock Vina</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="prepare-ligand-files">4. Prepare Ligand Files<a class="anchor" aria-label="anchor" href="#prepare-ligand-files"></a>
 </h3>
-<div class="section level4">
-<h4 id="file-format-conversion">File Format Conversion<a class="anchor" aria-label="anchor" href="#file-format-conversion"></a>
-</h4>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Convert SDF to MOL2</span></span>
-<span><span class="va">converted_files</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/convert_molecule.html">convert_molecule</a></span><span class="op">(</span></span>
-<span>  input_file <span class="op">=</span> <span class="st">"receptors"</span>,</span>
-<span>  output_format <span class="op">=</span> <span class="st">"mol2"</span></span>
+<p>Ligands also need to be prepared for docking:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Step 1: Convert SDF files to MOL2 format</span></span>
+<span><span class="va">converted_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_molecule.html">convert_molecule</a></span><span class="op">(</span></span>
+<span>  input_file <span class="op">=</span> <span class="st">"./ligands/"</span>,</span>
+<span>  output_format <span class="op">=</span> <span class="st">"mol2"</span>,</span>
+<span>  output_dir <span class="op">=</span> <span class="st">"./ligands_mol2/"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Convert ligand files to PDBQT format for docking</span></span>
+<span><span class="co"># Step 2: Convert ligand files to PDBQT format for docking</span></span>
 <span><span class="va">ligand_pdbqt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prepare_ligand.html">prepare_ligand</a></span><span class="op">(</span></span>
 <span>  <span class="va">converted_files</span>,</span>
 <span>  out_dir <span class="op">=</span> <span class="st">"prepared_ligands"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-</div>
+<p>These steps prepare the ligand structures:</p>
+<ul>
+<li>convert_molecule converts the downloaded structures to MOL2 format
+using OpenBabel</li>
+<li>prepare_ligand converts the MOL2 files to PDBQT format, adding
+partial charges, atom types, and setting up rotatable bonds</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="calculate-docking-box-parameters">5. Calculate Docking Box Parameters<a class="anchor" aria-label="anchor" href="#calculate-docking-box-parameters"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<p>Before docking, we need to define the search space (docking box)
+where the ligand will be positioned:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Determine appropriate docking box dimensions and center coordinates</span></span>
-<span><span class="va">box_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_box.html">calculate_box</a></span><span class="op">(</span><span class="va">pdb_files</span>, padding <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">box_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_box.html">calculate_box</a></span><span class="op">(</span><span class="va">split_files</span>, padding <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">box_params</span><span class="op">)</span></span></code></pre></div>
+<p>This step analyzes the receptor structures to determine the optimal
+dimensions and center coordinates for the docking box. The padding
+parameter adds extra space around the protein to ensure the entire
+binding site is included in the search space.</p>
 </div>
 <div class="section level3">
 <h3 id="generate-configuration-files">6. Generate Configuration Files<a class="anchor" aria-label="anchor" href="#generate-configuration-files"></a>
 </h3>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create configuration files for docking</span></span>
+<p>Now we’ll create configuration files for AutoDock Vina:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create configuration files for each receptor-ligand pair</span></span>
 <span><span class="va">config_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/write_configs.html">write_configs</a></span><span class="op">(</span></span>
 <span>  receptor_paths <span class="op">=</span> <span class="va">receptor_pdbqt</span>,</span>
 <span>  ligand_paths <span class="op">=</span> <span class="va">ligand_pdbqt</span>,</span>
 <span>  box_df <span class="op">=</span> <span class="va">box_params</span>,</span>
-<span>  out_dir <span class="op">=</span> <span class="st">"configs"</span></span>
+<span>  out_dir <span class="op">=</span> <span class="st">"configs"</span>,</span>
+<span>  exhaustiveness <span class="op">=</span> <span class="fl">8</span>,  <span class="co"># Search thoroughness</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<p>This step generates configuration files that specify all parameters
+for the docking runs, including:</p>
+<ul>
+<li>Paths to receptor and ligand files</li>
+<li>Docking box center and dimensions</li>
+<li>Search exhaustiveness (higher values give more thorough but slower
+searches)</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="run-docking">7. Run Docking<a class="anchor" aria-label="anchor" href="#run-docking"></a>
 </h3>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<p>Now we’re ready to perform the actual docking simulations:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run molecular docking using AutoDock Vina</span></span>
-<span><span class="fu"><a href="../reference/run_vina.html">run_vina</a></span><span class="op">(</span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_vina.html">run_vina</a></span><span class="op">(</span></span>
 <span>  config_paths <span class="op">=</span> <span class="st">"configs"</span>,</span>
-<span>  out <span class="op">=</span> <span class="st">"docked"</span>,</span>
-<span>  logs <span class="op">=</span> <span class="st">"logs"</span></span>
+<span>  out_dir <span class="op">=</span> <span class="st">"docked"</span>,</span>
+<span>  log_dir <span class="op">=</span> <span class="st">"logs"</span>,</span>
+<span>  cpu <span class="op">=</span> <span class="fl">4</span>  <span class="co"># Use 4 CPU cores</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<p>This step executes AutoDock Vina to perform the docking simulations
+for all receptor-ligand pairs. The docking algorithm searches for
+optimal binding poses and scores them based on estimated binding
+affinity. Using multiple CPU cores can significantly speed up the
+process.</p>
 </div>
 <div class="section level3">
 <h3 id="check-and-rerun-failed-docking-jobs">8. Check and Rerun Failed Docking Jobs<a class="anchor" aria-label="anchor" href="#check-and-rerun-failed-docking-jobs"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<p>Sometimes docking jobs may fail, so we can check and rerun them:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check log files and rerun any failed docking jobs</span></span>
 <span><span class="fu"><a href="../reference/check_logs.html">check_logs</a></span><span class="op">(</span></span>
 <span>  logs <span class="op">=</span> <span class="st">"logs"</span>,</span>
 <span>  out <span class="op">=</span> <span class="st">"docked"</span>,</span>
 <span>  config_paths <span class="op">=</span> <span class="st">"configs"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<p>This step examines the log files to identify any failed docking runs
+and automatically reruns them. This ensures that all receptor-ligand
+pairs are successfully processed.</p>
 </div>
 <div class="section level3">
 <h3 id="parse-docking-results">9. Parse Docking Results<a class="anchor" aria-label="anchor" href="#parse-docking-results"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<p>Finally, we’ll analyze the docking results:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Parse all log files and combine results</span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_logs.html">parse_logs</a></span><span class="op">(</span>log_folder <span class="op">=</span> <span class="st">"logs"</span><span class="op">)</span></span>
+<span><span class="va">results_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_logs.html">parse_logs</a></span><span class="op">(</span>log_dir <span class="op">=</span> <span class="st">"logs"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># View top binding poses</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">affinity_kcalmol</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># View top binding poses sorted by binding affinity</span></span>
+<span><span class="va">top_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results_df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">results_df</span><span class="op">$</span><span class="va">affinity_kcalmol</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">top_results</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Save results to CSV file</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">results_df</span>, <span class="st">"docking_results.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>This step extracts and organizes the docking results from all log
+files, including:</p>
+<ul>
+<li>Binding affinities (lower values indicate stronger binding)</li>
+<li>Receptor and ligand identifiers</li>
+<li>Ranking of binding poses</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="direct-docking-mode">Direct Docking Mode<a class="anchor" aria-label="anchor" href="#direct-docking-mode"></a>
 </h3>
 <p>You can also run docking directly without configuration files:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/run_vina.html">run_vina</a></span><span class="op">(</span></span>
 <span>  receptor <span class="op">=</span> <span class="st">"receptor.pdbqt"</span>,</span>
 <span>  ligand <span class="op">=</span> <span class="st">"ligand.pdbqt"</span>,</span>

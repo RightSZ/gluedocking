@@ -48,6 +48,7 @@ and storing paths to required external tools in the R environment file.</p>
 <span>  python_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prepare_receptor_script <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prepare_ligand_script <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  prepare_split_alt_script <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  obabel_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  vina_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  force <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -68,6 +69,10 @@ and storing paths to required external tools in the R environment file.</p>
 
 <dt id="arg-prepare-ligand-script">prepare_ligand_script<a class="anchor" aria-label="anchor" href="#arg-prepare-ligand-script"></a></dt>
 <dd><p>Character, path to prepare_ligand4.py script</p></dd>
+
+
+<dt id="arg-prepare-split-alt-script">prepare_split_alt_script<a class="anchor" aria-label="anchor" href="#arg-prepare-split-alt-script"></a></dt>
+<dd><p>Character, path to prepare_pdb_split_alt_confs.py script</p></dd>
 
 
 <dt id="arg-obabel-path">obabel_path<a class="anchor" aria-label="anchor" href="#arg-obabel-path"></a></dt>
@@ -94,6 +99,7 @@ and storing paths to required external tools in the R environment file.</p>
 <span class="r-in"><span>  python_path <span class="op">=</span> <span class="st">"C:/Python39/python.exe"</span>,</span></span>
 <span class="r-in"><span>  prepare_receptor_script <span class="op">=</span> <span class="st">"C:/MGLTools/scripts/prepare_receptor4.py"</span>,</span></span>
 <span class="r-in"><span>  prepare_ligand_script <span class="op">=</span> <span class="st">"C:/MGLTools/scripts/prepare_ligand4.py"</span>,</span></span>
+<span class="r-in"><span>  prepare_split_alt_script <span class="op">=</span> <span class="st">"C:/MGLTools/scripts/prepare_pdb_split_alt_confs.py"</span>,</span></span>
 <span class="r-in"><span>  obabel_path <span class="op">=</span> <span class="st">"C:/OpenBabel/bin/obabel.exe"</span>,</span></span>
 <span class="r-in"><span>  vina_path <span class="op">=</span> <span class="st">"C:/AutoDock_Vina/vina.exe"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
