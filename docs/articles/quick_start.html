@@ -77,13 +77,25 @@
 specifying the paths to the required external tools:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">gluedocking</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu"><a href="../reference/prepare_for_gluedocking.html">prepare_for_gluedocking</a></span><span class="op">(</span></span>
-<span>  python_path <span class="op">=</span> <span class="st">"/path/to/python"</span>,</span>
-<span>  prepare_receptor_script <span class="op">=</span> <span class="st">"/path/to/MGLTools/scripts/prepare_receptor4.py"</span>,</span>
-<span>  prepare_ligand_script <span class="op">=</span> <span class="st">"/path/to/MGLTools/scripts/prepare_ligand4.py"</span>,</span>
-<span>  obabel_path <span class="op">=</span> <span class="st">"/path/to/openbabel/bin/obabel"</span>,</span>
-<span>  vina_path <span class="op">=</span> <span class="st">"/path/to/autodock_vina/vina"</span></span>
+<span>  python_path <span class="op">=</span> <span class="st">"/your_path/python.exe"</span>,</span>
+<span>  prepare_receptor_script <span class="op">=</span> <span class="st">"/your_path/prepare_receptor4.py"</span>,</span>
+<span>  prepare_ligand_script <span class="op">=</span> <span class="st">"/your_path/prepare_ligand4.py"</span>,</span>
+<span>  obabel_path <span class="op">=</span> <span class="st">"/your_path/obabel.exe"</span>,</span>
+<span>  vina_path <span class="op">=</span> <span class="st">"/your_path/qvinaw.exe"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively, you can use the <code>file4gluedocking</code> package
+to get the paths:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Install file4gluedocking from GitHub</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"RightSZ/file4gluedocking"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">file4gluedocking</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/prepare_for_gluedocking.html">prepare_for_gluedocking</a></span><span class="op">(</span></span>
+<span>  python_path <span class="op">=</span> <span class="fu">get_python_path</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  prepare_receptor_script <span class="op">=</span> <span class="fu">get_prepare_receptor_path</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  prepare_ligand_script <span class="op">=</span> <span class="fu">get_prepare_ligand_path</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  obabel_path <span class="op">=</span> <span class="fu">get_obabel_path</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  vina_path <span class="op">=</span> <span class="fu">get_qvinaw_path</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>This will store the paths in your R environment file, so you only
 need to run this once.</p>
@@ -94,21 +106,21 @@ need to run this once.</p>
 <div class="section level3">
 <h3 id="download-receptor-structures">1. Download Receptor Structures<a class="anchor" aria-label="anchor" href="#download-receptor-structures"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download PDB files from RCSB PDB database</span></span>
 <span><span class="va">pdb_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_receptor.html">download_receptor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1iep"</span>, <span class="st">"4hg7"</span><span class="op">)</span>, out_dir <span class="op">=</span> <span class="st">"receptors"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="download-ligand-structures">2. Download Ligand Structures<a class="anchor" aria-label="anchor" href="#download-ligand-structures"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download ligand structures from PubChem</span></span>
 <span><span class="va">ligand_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_ligand.html">download_ligand</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2244"</span>, <span class="st">"5090"</span><span class="op">)</span>, out_dir <span class="op">=</span> <span class="st">"ligands"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="prepare-receptor-files">3. Prepare Receptor Files<a class="anchor" aria-label="anchor" href="#prepare-receptor-files"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert PDB files to PDBQT format for docking</span></span>
 <span><span class="va">receptor_pdbqt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prepare_receptor.html">prepare_receptor</a></span><span class="op">(</span></span>
 <span>  <span class="va">pdb_files</span>,</span>
@@ -121,16 +133,16 @@ need to run this once.</p>
 <div class="section level4">
 <h4 id="file-format-conversion">File Format Conversion<a class="anchor" aria-label="anchor" href="#file-format-conversion"></a>
 </h4>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Convert SDF to PDB</span></span>
-<span><span class="fu"><a href="../reference/convert_molecule.html">convert_molecule</a></span><span class="op">(</span></span>
-<span>  input_file <span class="op">=</span> <span class="st">"ligands/compound.sdf"</span>,</span>
-<span>  output_format <span class="op">=</span> <span class="st">"mol2"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Convert ligand files to PDBQT format for docking</span></span>
+<code class="sourceCode R"><span><span class="co"># Convert SDF to MOL2</span></span>
+<span><span class="va">converted_files</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/convert_molecule.html">convert_molecule</a></span><span class="op">(</span></span>
+<span>  input_file <span class="op">=</span> <span class="st">"receptors"</span>,</span>
+<span>  output_format <span class="op">=</span> <span class="st">"mol2"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Convert ligand files to PDBQT format for docking</span></span>
 <span><span class="va">ligand_pdbqt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prepare_ligand.html">prepare_ligand</a></span><span class="op">(</span></span>
-<span>  <span class="va">ligand_files</span>,</span>
+<span>  <span class="va">converted_files</span>,</span>
 <span>  out_dir <span class="op">=</span> <span class="st">"prepared_ligands"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>

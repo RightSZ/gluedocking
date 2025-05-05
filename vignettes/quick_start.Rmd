@@ -85,17 +85,15 @@ receptor_pdbqt <- prepare_receptor(
 ### 4. Prepare Ligand Files
 #### File Format Conversion
 ``` r
-# Convert SDF to PDB
-convert_molecule(
-  input_file = "ligands/compound.sdf",
+# Convert SDF to MOL2
+converted_files<-convert_molecule(
+  input_file = "receptors",
   output_format = "mol2"
 )
-```
 
-``` r
 # Convert ligand files to PDBQT format for docking
 ligand_pdbqt <- prepare_ligand(
-  ligand_files,
+  converted_files,
   out_dir = "prepared_ligands"
 )
 ```
