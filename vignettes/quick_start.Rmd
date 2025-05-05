@@ -33,9 +33,10 @@ Before using gluedocking, you need to configure the environment by specifying th
 ``` r
 library(gluedocking)
 prepare_for_gluedocking(
-  python_path = "/your_path/python.exe",
-  prepare_receptor_script = "/your_path/prepare_receptor4.py",
-  prepare_ligand_script = "/your_path/prepare_ligand4.py",
+  python_path = "/your_path/autodock/python.exe",
+  prepare_receptor_script = "/your_path/autodock/Lib/site-packages/AutoDockTools/Utilities24/prepare_receptor4.py",
+  prepare_ligand_script = "/your_path/autodock/Lib/site-packages/AutoDockTools/Utilities24/prepare_ligand4.py",
+  prepare_split_alt_script = "/your_path/autodock/Lib/site-packages/AutoDockTools/Utilities24/prepare_pdb_split_alt_confs.py",
   obabel_path = "/your_path/obabel.exe",
   vina_path = "/your_path/qvinaw.exe"
 )
@@ -73,16 +74,14 @@ Raw PDB files often contain elements that need to be removed or modified before 
 
 ``` r
 # Step 1: Remove non-protein atoms (water, ligands, etc.)
-trim_receptor("./receptors/", output_dir = "trimmed")
+trimmed_files<-trim_receptor("./receptors/", output_dir = "trimmed")
 
 # Step 2: Split alternate conformations (if present)
-split_alt(
+pbd_files<-split_alt(
   inputs = trimmed_files,
   out_dir = "split_alt",
   keep_label = "A"  # Keep only the "A" conformation
 )
-pbd_files<-paste0("./split_alt/",dir("./split_alt/"))
-
 # Step 3: Convert PDB files to PDBQT format for docking
 receptor_pdbqt <- prepare_receptor(
   pbd_files,

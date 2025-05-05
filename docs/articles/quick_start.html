@@ -78,9 +78,10 @@ specifying the paths to the required external tools:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">gluedocking</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/prepare_for_gluedocking.html">prepare_for_gluedocking</a></span><span class="op">(</span></span>
-<span>  python_path <span class="op">=</span> <span class="st">"/your_path/python.exe"</span>,</span>
-<span>  prepare_receptor_script <span class="op">=</span> <span class="st">"/your_path/prepare_receptor4.py"</span>,</span>
-<span>  prepare_ligand_script <span class="op">=</span> <span class="st">"/your_path/prepare_ligand4.py"</span>,</span>
+<span>  python_path <span class="op">=</span> <span class="st">"/your_path/autodock/python.exe"</span>,</span>
+<span>  prepare_receptor_script <span class="op">=</span> <span class="st">"/your_path/autodock/Lib/site-packages/AutoDockTools/Utilities24/prepare_receptor4.py"</span>,</span>
+<span>  prepare_ligand_script <span class="op">=</span> <span class="st">"/your_path/autodock/Lib/site-packages/AutoDockTools/Utilities24/prepare_ligand4.py"</span>,</span>
+<span>  prepare_split_alt_script <span class="op">=</span> <span class="st">"/your_path/autodock/Lib/site-packages/AutoDockTools/Utilities24/prepare_pdb_split_alt_confs.py"</span>,</span>
 <span>  obabel_path <span class="op">=</span> <span class="st">"/your_path/obabel.exe"</span>,</span>
 <span>  vina_path <span class="op">=</span> <span class="st">"/your_path/qvinaw.exe"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -125,16 +126,14 @@ their binding interactions.</p>
 modified before docking. We’ll process them in several steps:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Step 1: Remove non-protein atoms (water, ligands, etc.)</span></span>
-<span><span class="fu"><a href="../reference/trim_receptor.html">trim_receptor</a></span><span class="op">(</span><span class="st">"./receptors/"</span>, output_dir <span class="op">=</span> <span class="st">"trimmed"</span><span class="op">)</span></span>
+<span><span class="va">trimmed_files</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/trim_receptor.html">trim_receptor</a></span><span class="op">(</span><span class="st">"./receptors/"</span>, output_dir <span class="op">=</span> <span class="st">"trimmed"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Step 2: Split alternate conformations (if present)</span></span>
-<span><span class="fu">split_alt</span><span class="op">(</span></span>
+<span><span class="va">pbd_files</span><span class="op">&lt;-</span><span class="fu">split_alt</span><span class="op">(</span></span>
 <span>  inputs <span class="op">=</span> <span class="va">trimmed_files</span>,</span>
 <span>  out_dir <span class="op">=</span> <span class="st">"split_alt"</span>,</span>
 <span>  keep_label <span class="op">=</span> <span class="st">"A"</span>  <span class="co"># Keep only the "A" conformation</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">pbd_files</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"./split_alt/"</span>,<span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="st">"./split_alt/"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
 <span><span class="co"># Step 3: Convert PDB files to PDBQT format for docking</span></span>
 <span><span class="va">receptor_pdbqt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prepare_receptor.html">prepare_receptor</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbd_files</span>,</span>

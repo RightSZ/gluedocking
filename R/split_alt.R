@@ -1,3 +1,22 @@
+#' Split PDB files with alternate locations
+#'
+#' This function processes PDB files to handle alternate location indicators
+#' by keeping only the specified alternate location (default is 'A') and
+#' removing others. It uses an external Python script to perform the splitting.
+#'
+#' @param inputs Character vector of file paths or directories containing PDB files
+#' @param out_dir Character, output directory for processed files, default "split_alt"
+#' @param python_path Character, path to Python executable, default NULL (uses GLUEDOCK_PYTHON_PATH environment variable)
+#' @param script_path Character, path to the splitting script, default NULL (uses GLUEDOCK_PREPARE_SPLIT_ALT environment variable)
+#' @param keep_label Character, alternate location label to keep, default "A"
+#'
+#' @return Invisibly returns a character vector of paths to successfully processed files
+#' @export
+#' @examples
+#' \dontrun{
+#' # Process a single PDB file
+#' split_alt("protein.pdb", out_dir = "processed")
+#' }
 split_alt <- function(inputs,
                       out_dir = "split_alt",
                       python_path = NULL,
@@ -40,8 +59,13 @@ split_alt <- function(inputs,
 
 #' Collect PDB files from input paths
 #'
+#' This internal function scans the provided inputs and collects all PDB files.
+#' It handles both individual files and directories, recursively finding all
+#' files with .pdb extension.
+#'
 #' @param inputs Character vector of file paths or directories
 #' @return Character vector of PDB file paths
+#' @keywords internal
 collect_pdb_files <- function(inputs) {
   unlist(lapply(inputs, function(x) {
     if (dir.exists(x)) {
