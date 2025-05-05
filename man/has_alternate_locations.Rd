@@ -15,3 +15,4 @@ Logical indicating if alternate locations exist
 \description{
 Check if PDB file contains alternate locations
 }
+\keyword{internal}

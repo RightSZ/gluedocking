@@ -11,12 +11,12 @@
 #' @param keep_label Character, alternate location label to keep, default "A"
 #'
 #' @return Invisibly returns a character vector of paths to successfully processed files
-#' @export
 #' @examples
 #' \dontrun{
 #' # Process a single PDB file
 #' split_alt("protein.pdb", out_dir = "processed")
 #' }
+#' @export
 split_alt <- function(inputs,
                       out_dir = "split_alt",
                       python_path = NULL,
@@ -88,6 +88,7 @@ collect_pdb_files <- function(inputs) {
 #'
 #' @param pdb_file Path to PDB file
 #' @return Logical indicating if alternate locations exist
+#' @keywords internal
 has_alternate_locations <- function(pdb_file) {
   lines <- readLines(pdb_file)
   atom_lines <- lines[grepl("^(ATOM|HETATM)", lines)]
@@ -105,6 +106,7 @@ has_alternate_locations <- function(pdb_file) {
 #' @param script_path Path to splitting script
 #' @param keep_label Label to keep (default "A")
 #' @return Character vector of processed file paths
+#' @keywords internal
 process_pdb_files <- function(pdbs, out_dir, python_path, script_path, keep_label) {
   kept <- character(0)
 
@@ -137,6 +139,7 @@ process_pdb_files <- function(pdbs, out_dir, python_path, script_path, keep_labe
 #' @param out_file Expected output file path
 #' @param keep_label Label to keep
 #' @return Character vector with path to processed file if successful
+#' @keywords internal
 split_pdb_with_script <- function(pdb_file, out_dir, stem, python_path, script_path, out_file, keep_label) {
   prefix <- file.path(out_dir, stem)
   prefix_norm <- normalizePath(prefix, winslash = "/", mustWork = FALSE)

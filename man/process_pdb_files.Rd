@@ -23,3 +23,4 @@ Character vector of processed file paths
 \description{
 Process PDB files for alternate location splitting
 }
+\keyword{internal}

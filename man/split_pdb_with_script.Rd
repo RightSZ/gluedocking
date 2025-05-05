@@ -35,3 +35,4 @@ Character vector with path to processed file if successful
 \description{
 Split PDB file with external Python script
 }
+\keyword{internal}
