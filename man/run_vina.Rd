@@ -44,3 +44,13 @@ run_vina(
 \description{
 This function runs molecular docking using AutoDock Vina.
 }
+\examples{
+\dontrun{
+# Run molecular docking using AutoDock Vina
+run_vina(
+  config_paths = "configs",
+  out = "docked",
+  logs = "logs"
+)
+}
+}

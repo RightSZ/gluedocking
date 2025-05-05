@@ -590,13 +590,7 @@ prepare_ligand <- function(mol_files, out_dir = "./",
 #' @examples
 #' \dontrun{
 #' # Convert SDF to PDB
-#' convert_molecule("ligand.sdf", output_format = "pdb")
-#'
-#' # Convert MOL to PDBQT with specific output file
-#' convert_molecule("molecule.mol", output_file = "prepared/molecule.pdbqt")
-#'
-#' # Specify both input and output formats explicitly
-#' convert_molecule("compound.xyz", input_format = "xyz", output_format = "mol2")
+#' convert_molecule("ligand.sdf", output_format = "mol2")
 #' }
 #'
 #' @export
@@ -689,7 +683,7 @@ convert_molecule <- function(input_file, input_format = NULL,
 #' @import bio3d
 #' @examples
 #' \dontrun{
-#' box_params <- calculate_box(pdb_files, padding = 4)
+#' box_params <- calculate_box(pdb_files, padding = 5)
 #' }
 #'
 #' @export
@@ -781,6 +775,16 @@ calculate_box <- function(pdb_files, padding = 5) {
 #' @param exhaustiveness Integer, search intensity, default 8
 #' @return               All written configuration file paths (invisible return)
 #' @importFrom tools file_path_sans_ext
+#' @examples
+#' \dontrun{
+#' # Create configuration files for docking
+#' config_files <- write_configs(
+#'   receptor_paths = receptor_pdbqt,
+#'   ligand_paths = ligand_pdbqt,
+#'   box_df = box_params,
+#'   out_dir = "configs"
+#' )
+#' }
 #' @export
 write_configs <- function(receptor_paths,
                           ligand_paths,
@@ -886,6 +890,15 @@ write_configs <- function(receptor_paths,
 #' @param seed Integer, random seed for reproducibility, default 12345
 #' @param cpu Integer, number of CPU cores to use for parallel computation, default NULL (auto-detect)
 #' @importFrom tools file_path_sans_ext
+#' @examples
+#' \dontrun{
+#' # Run molecular docking using AutoDock Vina
+#' run_vina(
+#'   config_paths = "configs",
+#'   out = "docked",
+#'   logs = "logs"
+#' )
+#' }
 #' @export
 run_vina <- function(receptor = NULL, ligand = NULL, center = NULL, size = NULL,
                      config_paths = NULL, exhaustiveness = 8, out = "docked",
@@ -1072,6 +1085,15 @@ run_vina <- function(receptor = NULL, ligand = NULL, center = NULL, size = NULL,
 #' @param force Logical, whether to force rerun all jobs regardless of log status, default FALSE
 #' @return Character vector of rerun log files
 #' @importFrom tools file_path_sans_ext
+#' @examples
+#' \dontrun{
+#' # Check log files and rerun any failed docking jobs
+#' check_logs(
+#'   logs = "logs",
+#'   out = "docked",
+#'   config_paths = "configs"
+#' )
+#' }
 #' @export
 check_logs <- function(logs = "logs", out = "docked", config_paths = NULL,
                        vina_path = NULL, seed = 12345, cpu = NULL, force = FALSE) {
@@ -1218,6 +1240,11 @@ parse_qvina_log <- function(file_path) {
 #' @param pattern Character, pattern to match log files, default "\\.txt$"
 #' @param verbose Logical, whether to print detailed messages, default TRUE
 #' @return A data frame containing combined docking results from all log files
+#' @examples
+#' \dontrun{
+#' # Parse all log files and combine results
+#' results <- parse_logs(log_folder = "logs")
+#' }
 #' @export
 parse_logs <- function(log_folder = "logs", pattern = "\\.txt$", verbose = TRUE) {
   if (!dir.exists(log_folder)) {

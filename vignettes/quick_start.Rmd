@@ -1,0 +1,154 @@
+---
+title: "Quick Start"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{quick_start}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This document demonstrates how to use the **gluedocking** package.
+
+**Note**: Ensure dependency packages are installed:
+
+``` r
+install.packages(c("httr", "bio3d"))
+```
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(gluedocking)
+```
+
+## Setup
+
+Before using gluedocking, you need to configure the environment by specifying the paths to the required external tools:
+
+``` r
+library(gluedocking)
+
+prepare_for_gluedocking(
+  python_path = "/path/to/python",
+  prepare_receptor_script = "/path/to/MGLTools/scripts/prepare_receptor4.py",
+  prepare_ligand_script = "/path/to/MGLTools/scripts/prepare_ligand4.py",
+  obabel_path = "/path/to/openbabel/bin/obabel",
+  vina_path = "/path/to/autodock_vina/vina"
+)
+```
+
+This will store the paths in your R environment file, so you only need to run this once.
+
+## Usage Examples
+
+### 1. Download Receptor Structures
+
+``` r
+# Download PDB files from RCSB PDB database
+pdb_files <- download_receptor(c("1iep", "4hg7"), out_dir = "receptors")
+```
+
+### 2. Download Ligand Structures
+
+``` r
+# Download ligand structures from PubChem
+ligand_files <- download_ligand(c("2244", "5090"), out_dir = "ligands")
+```
+
+### 3. Prepare Receptor Files
+
+``` r
+# Convert PDB files to PDBQT format for docking
+receptor_pdbqt <- prepare_receptor(
+  pdb_files,
+  out_dir = "prepared_receptors"
+)
+```
+
+### 4. Prepare Ligand Files
+#### File Format Conversion
+``` r
+# Convert SDF to PDB
+convert_molecule(
+  input_file = "ligands/compound.sdf",
+  output_format = "mol2"
+)
+```
+
+``` r
+# Convert ligand files to PDBQT format for docking
+ligand_pdbqt <- prepare_ligand(
+  ligand_files,
+  out_dir = "prepared_ligands"
+)
+```
+
+### 5. Calculate Docking Box Parameters
+
+``` r
+# Determine appropriate docking box dimensions and center coordinates
+box_params <- calculate_box(pdb_files, padding = 5)
+```
+
+### 6. Generate Configuration Files
+
+``` r
+# Create configuration files for docking
+config_files <- write_configs(
+  receptor_paths = receptor_pdbqt,
+  ligand_paths = ligand_pdbqt,
+  box_df = box_params,
+  out_dir = "configs"
+)
+```
+
+### 7. Run Docking
+
+``` r
+# Run molecular docking using AutoDock Vina
+run_vina(
+  config_paths = "configs",
+  out = "docked",
+  logs = "logs"
+)
+```
+
+### 8. Check and Rerun Failed Docking Jobs
+
+``` r
+# Check log files and rerun any failed docking jobs
+check_logs(
+  logs = "logs",
+  out = "docked",
+  config_paths = "configs"
+)
+```
+
+### 9. Parse Docking Results
+
+``` r
+# Parse all log files and combine results
+results <- parse_logs(log_folder = "logs")
+
+# View top binding poses
+head(results[order(results$affinity_kcalmol), ])
+```
+
+### Direct Docking Mode
+
+You can also run docking directly without configuration files:
+
+``` r
+run_vina(
+  receptor = "receptor.pdbqt",
+  ligand = "ligand.pdbqt",
+  center = c(0, 0, 0),
+  size = c(20, 20, 20),
+  exhaustiveness = 8
+)
+```

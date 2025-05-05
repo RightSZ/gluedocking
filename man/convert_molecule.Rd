@@ -33,13 +33,7 @@ using the OpenBabel chemical toolbox.
 \examples{
 \dontrun{
 # Convert SDF to PDB
-convert_molecule("ligand.sdf", output_format = "pdb")
-
-# Convert MOL to PDBQT with specific output file
-convert_molecule("molecule.mol", output_file = "prepared/molecule.pdbqt")
-
-# Specify both input and output formats explicitly
-convert_molecule("compound.xyz", input_format = "xyz", output_format = "mol2")
+convert_molecule("ligand.sdf", output_format = "mol2")
 }
 
 }

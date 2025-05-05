@@ -19,3 +19,9 @@ A data frame containing combined docking results from all log files
 \description{
 Parse all log files in a directory and combine results
 }
+\examples{
+\dontrun{
+# Parse all log files and combine results
+results <- parse_logs(log_folder = "logs")
+}
+}

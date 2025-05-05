@@ -35,3 +35,13 @@ Character vector of rerun log files
 \description{
 Check docking log files and rerun failed docking jobs
 }
+\examples{
+\dontrun{
+# Check log files and rerun any failed docking jobs
+check_logs(
+  logs = "logs",
+  out = "docked",
+  config_paths = "configs"
+)
+}
+}

@@ -13,3 +13,7 @@ Imports:
     bio3d,
     tools,
     utils
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

@@ -20,7 +20,7 @@ dimensions and center coordinates based on the protein structure.
 }
 \examples{
 \dontrun{
-box_params <- calculate_box(pdb_files, padding = 4)
+box_params <- calculate_box(pdb_files, padding = 5)
 }
 
 }

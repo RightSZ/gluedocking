@@ -32,3 +32,14 @@ size_x/size_y/size_z}
 \description{
 Generate qvina or qvina-w config files for docking
 }
+\examples{
+\dontrun{
+# Create configuration files for docking
+config_files <- write_configs(
+  receptor_paths = receptor_pdbqt,
+  ligand_paths = ligand_pdbqt,
+  box_df = box_params,
+  out_dir = "configs"
+)
+}
+}
