@@ -48,8 +48,8 @@
 <span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  config_paths <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  exhaustiveness <span class="op">=</span> <span class="fl">8</span>,</span>
-<span>  out <span class="op">=</span> <span class="st">"docked"</span>,</span>
-<span>  logs <span class="op">=</span> <span class="st">"logs"</span>,</span>
+<span>  output_dir <span class="op">=</span> <span class="st">"docked"</span>,</span>
+<span>  logs_dir <span class="op">=</span> <span class="st">"logs"</span>,</span>
 <span>  vina_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">12345</span>,</span>
 <span>  cpu <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -84,11 +84,11 @@
 <dd><p>Integer, search intensity, default 8 (only for direct mode)</p></dd>
 
 
-<dt id="arg-out">out<a class="anchor" aria-label="anchor" href="#arg-out"></a></dt>
+<dt id="arg-output-dir">output_dir<a class="anchor" aria-label="anchor" href="#arg-output-dir"></a></dt>
 <dd><p>Character, output directory for docked files, default "docked"</p></dd>
 
 
-<dt id="arg-logs">logs<a class="anchor" aria-label="anchor" href="#arg-logs"></a></dt>
+<dt id="arg-logs-dir">logs_dir<a class="anchor" aria-label="anchor" href="#arg-logs-dir"></a></dt>
 <dd><p>Character, output directory for log files, default "logs"</p></dd>
 
 
@@ -111,8 +111,8 @@
 <span class="r-in"><span><span class="co"># Run molecular docking using AutoDock Vina</span></span></span>
 <span class="r-in"><span><span class="fu">run_vina</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  config_paths <span class="op">=</span> <span class="st">"configs"</span>,</span></span>
-<span class="r-in"><span>  out <span class="op">=</span> <span class="st">"docked"</span>,</span></span>
-<span class="r-in"><span>  logs <span class="op">=</span> <span class="st">"logs"</span></span></span>
+<span class="r-in"><span>  output_dir <span class="op">=</span> <span class="st">"docked"</span>,</span></span>
+<span class="r-in"><span>  logs_dir <span class="op">=</span> <span class="st">"logs"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>

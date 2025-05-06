@@ -165,7 +165,7 @@ convert_molecule <- function(input_file, input_format = NULL,
 #' converting them to PDBQT format using AutoDock Tools scripts.
 #'
 #' @param mol_files Character vector of paths to molecule files (SDF, MOL, etc.)
-#' @param out_dir Character, output directory for prepared files, default "./"
+#' @param output_dir Character, output directory for prepared files, default "./"
 #' @param python_path Character, path to Python executable, default "python"
 #' @param prepare_script Character, path to prepare_ligand4.py script
 #' @param add_opts Character, additional options to pass to prepare_ligand4.py, default "-A hydrogens"
@@ -175,12 +175,12 @@ convert_molecule <- function(input_file, input_format = NULL,
 #' @examples
 #' \dontrun{
 #' pdbqt_files <- prepare_ligand(sdf_files,
-#'                               out_dir = "prepared",
+#'                               output_dir = "prepared",
 #'                               prepare_script = "path/to/prepare_ligand4.py")
 #' }
 #'
 #' @export
-prepare_ligand <- function(mol_files, out_dir = "./",
+prepare_ligand <- function(mol_files, output_dir = "./",
                            python_path = NULL,
                            prepare_script = NULL,
                            add_opts = "-A hydrogens") {
@@ -191,9 +191,9 @@ prepare_ligand <- function(mol_files, out_dir = "./",
 
   mol_files <- as.character(mol_files)
 
-  if (!is.null(out_dir)) {
-    if (!dir.exists(out_dir)) {
-      dir.create(out_dir, recursive = TRUE)
+  if (!is.null(output_dir)) {
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
     }
   }
 
@@ -231,23 +231,23 @@ prepare_ligand <- function(mol_files, out_dir = "./",
     setwd(mol_dir)
 
 
-    if (is.null(out_dir)) {
+    if (is.null(output_dir)) {
       output_pdbqt <- paste0(base_name, ".pdbqt")
       abs_output_pdbqt <- file.path(mol_dir, output_pdbqt)
     } else {
 
-      if (!is_absolute_path(out_dir)) {
-        abs_out_dir <- file.path(original_wd, out_dir)
+      if (!is_absolute_path(output_dir)) {
+        abs_output_dir <- file.path(original_wd, output_dir)
       } else {
-        abs_out_dir <- out_dir
+        abs_output_dir <- output_dir
       }
 
-      if (!dir.exists(abs_out_dir)) {
-        dir.create(abs_out_dir, recursive = TRUE)
+      if (!dir.exists(abs_output_dir)) {
+        dir.create(abs_output_dir, recursive = TRUE)
       }
 
       output_pdbqt <- paste0(base_name, ".pdbqt")
-      abs_output_pdbqt <- file.path(abs_out_dir, output_pdbqt)
+      abs_output_pdbqt <- file.path(abs_output_dir, output_pdbqt)
     }
 
     tool_path <- normalizePath(prepare_script, winslash = "/", mustWork = FALSE)

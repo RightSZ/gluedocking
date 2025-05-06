@@ -129,15 +129,15 @@ modified before docking. We’ll process them in several steps:</p>
 <span><span class="va">trimmed_files</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/trim_receptor.html">trim_receptor</a></span><span class="op">(</span><span class="st">"./receptors/"</span>, output_dir <span class="op">=</span> <span class="st">"trimmed"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Step 2: Split alternate conformations (if present)</span></span>
-<span><span class="va">pbd_files</span><span class="op">&lt;-</span><span class="fu">split_alt</span><span class="op">(</span></span>
+<span><span class="va">pbd_files</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/split_alt.html">split_alt</a></span><span class="op">(</span></span>
 <span>  inputs <span class="op">=</span> <span class="va">trimmed_files</span>,</span>
-<span>  out_dir <span class="op">=</span> <span class="st">"split_alt"</span>,</span>
+<span>  output_dir <span class="op">=</span> <span class="st">"split_alt"</span>,</span>
 <span>  keep_label <span class="op">=</span> <span class="st">"A"</span>  <span class="co"># Keep only the "A" conformation</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co"># Step 3: Convert PDB files to PDBQT format for docking</span></span>
 <span><span class="va">receptor_pdbqt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prepare_receptor.html">prepare_receptor</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbd_files</span>,</span>
-<span>  out_dir <span class="op">=</span> <span class="st">"prepared_receptors"</span></span>
+<span>  output_dir <span class="op">=</span> <span class="st">"prepared_receptors"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>These steps prepare the receptor structures for docking:</p>
 <ul>
@@ -164,7 +164,7 @@ adding partial charges and atom types required by AutoDock Vina</li>
 <span><span class="co"># Step 2: Convert ligand files to PDBQT format for docking</span></span>
 <span><span class="va">ligand_pdbqt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prepare_ligand.html">prepare_ligand</a></span><span class="op">(</span></span>
 <span>  <span class="va">converted_files</span>,</span>
-<span>  out_dir <span class="op">=</span> <span class="st">"prepared_ligands"</span></span>
+<span>  output_dir <span class="op">=</span> <span class="st">"prepared_ligands"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>These steps prepare the ligand structures:</p>
 <ul>
@@ -198,7 +198,7 @@ binding site is included in the search space.</p>
 <span>  receptor_paths <span class="op">=</span> <span class="va">receptor_pdbqt</span>,</span>
 <span>  ligand_paths <span class="op">=</span> <span class="va">ligand_pdbqt</span>,</span>
 <span>  box_df <span class="op">=</span> <span class="va">box_params</span>,</span>
-<span>  out_dir <span class="op">=</span> <span class="st">"configs"</span>,</span>
+<span>  output_dir <span class="op">=</span> <span class="st">"configs"</span>,</span>
 <span>  exhaustiveness <span class="op">=</span> <span class="fl">8</span>,  <span class="co"># Search thoroughness</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>This step generates configuration files that specify all parameters
@@ -218,8 +218,8 @@ searches)</li>
 <code class="sourceCode R"><span><span class="co"># Run molecular docking using AutoDock Vina</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_vina.html">run_vina</a></span><span class="op">(</span></span>
 <span>  config_paths <span class="op">=</span> <span class="st">"configs"</span>,</span>
-<span>  out_dir <span class="op">=</span> <span class="st">"docked"</span>,</span>
-<span>  log_dir <span class="op">=</span> <span class="st">"logs"</span>,</span>
+<span>  output_dir <span class="op">=</span> <span class="st">"docked"</span>,</span>
+<span>  logs_dir <span class="op">=</span> <span class="st">"logs"</span>,</span>
 <span>  cpu <span class="op">=</span> <span class="fl">4</span>  <span class="co"># Use 4 CPU cores</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>This step executes AutoDock Vina to perform the docking simulations
@@ -235,8 +235,8 @@ process.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check log files and rerun any failed docking jobs</span></span>
 <span><span class="fu"><a href="../reference/check_logs.html">check_logs</a></span><span class="op">(</span></span>
-<span>  logs <span class="op">=</span> <span class="st">"logs"</span>,</span>
-<span>  out <span class="op">=</span> <span class="st">"docked"</span>,</span>
+<span>  logs_dir <span class="op">=</span> <span class="st">"logs"</span>,</span>
+<span>  output_dir <span class="op">=</span> <span class="st">"docked"</span>,</span>
 <span>  config_paths <span class="op">=</span> <span class="st">"configs"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>This step examines the log files to identify any failed docking runs

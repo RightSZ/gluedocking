@@ -8,7 +8,7 @@ write_configs(
   receptor_paths,
   ligand_paths,
   box_df,
-  out_dir = "configs",
+  output_dir = "configs",
   exhaustiveness = 8
 )
 }
@@ -21,7 +21,7 @@ write_configs(
 file (basename without path), center_x/center_y/center_z,
 size_x/size_y/size_z}
 
-\item{out_dir}{Output directory for configuration files}
+\item{output_dir}{Output directory for configuration files}
 
 \item{exhaustiveness}{Integer, search intensity, default 8}
 }
@@ -39,7 +39,7 @@ config_files <- write_configs(
   receptor_paths = receptor_pdbqt,
   ligand_paths = ligand_pdbqt,
   box_df = box_params,
-  out_dir = "configs"
+  output_dir = "configs"
 )
 }
 }

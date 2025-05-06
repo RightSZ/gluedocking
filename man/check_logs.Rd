@@ -5,8 +5,8 @@
 \title{Check docking log files and rerun failed docking jobs}
 \usage{
 check_logs(
-  logs = "logs",
-  out = "docked",
+  logs_dir = "logs",
+  output_dir = "docked",
   config_paths = NULL,
   vina_path = NULL,
   seed = 12345,
@@ -15,9 +15,9 @@ check_logs(
 )
 }
 \arguments{
-\item{logs}{Character, directory containing log files, default "logs"}
+\item{logs_dir}{Character, directory containing log files, default "logs"}
 
-\item{out}{Character, output directory for docked files, default "docked"}
+\item{output_dir}{Character, output directory for docked files, default "docked"}
 
 \item{config_paths}{Character vector of paths to config files or directories containing config files}
 
@@ -39,8 +39,8 @@ Check docking log files and rerun failed docking jobs
 \dontrun{
 # Check log files and rerun any failed docking jobs
 check_logs(
-  logs = "logs",
-  out = "docked",
+  logs_dir = "logs",
+  output_dir = "docked",
   config_paths = "configs"
 )
 }

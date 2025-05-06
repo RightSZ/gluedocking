@@ -6,7 +6,7 @@
 \usage{
 split_pdb_with_script(
   pdb_file,
-  out_dir,
+  output_dir,
   stem,
   python_path,
   script_path,
@@ -17,7 +17,7 @@ split_pdb_with_script(
 \arguments{
 \item{pdb_file}{Path to PDB file}
 
-\item{out_dir}{Output directory}
+\item{output_dir}{Output directory}
 
 \item{stem}{File stem name}
 

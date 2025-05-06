@@ -4,12 +4,12 @@
 \alias{download_receptor}
 \title{Download PDB files from RCSB PDB database}
 \usage{
-download_receptor(pdb_ids, out_dir = "./", verify_ssl = TRUE)
+download_receptor(pdb_ids, output_dir = "./", verify_ssl = TRUE)
 }
 \arguments{
 \item{pdb_ids}{Character vector of PDB IDs to download}
 
-\item{out_dir}{Character, output directory for downloaded files, default "./"}
+\item{output_dir}{Character, output directory for downloaded files, default "./"}
 
 \item{verify_ssl}{Logical, whether to verify SSL certificates, default TRUE}
 }
@@ -21,7 +21,7 @@ This function downloads PDB files from the RCSB Protein Data Bank using their PD
 }
 \examples{
 \dontrun{
-files <- download_receptor(c("1iep", "4hg7"), out_dir = "receptors")
+files <- download_receptor(c("1iep", "4hg7"), output_dir = "receptors")
 }
 
 }

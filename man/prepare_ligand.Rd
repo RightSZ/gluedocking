@@ -6,7 +6,7 @@
 \usage{
 prepare_ligand(
   mol_files,
-  out_dir = "./",
+  output_dir = "./",
   python_path = NULL,
   prepare_script = NULL,
   add_opts = "-A hydrogens"
@@ -15,7 +15,7 @@ prepare_ligand(
 \arguments{
 \item{mol_files}{Character vector of paths to molecule files (SDF, MOL, etc.)}
 
-\item{out_dir}{Character, output directory for prepared files, default "./"}
+\item{output_dir}{Character, output directory for prepared files, default "./"}
 
 \item{python_path}{Character, path to Python executable, default "python"}
 
@@ -33,7 +33,7 @@ converting them to PDBQT format using AutoDock Tools scripts.
 \examples{
 \dontrun{
 pdbqt_files <- prepare_ligand(sdf_files,
-                              out_dir = "prepared",
+                              output_dir = "prepared",
                               prepare_script = "path/to/prepare_ligand4.py")
 }
 

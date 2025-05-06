@@ -5,7 +5,7 @@
 #' removing others. It uses an external Python script to perform the splitting.
 #'
 #' @param inputs Character vector of file paths or directories containing PDB files
-#' @param out_dir Character, output directory for processed files, default "split_alt"
+#' @param output_dir Character, output directory for processed files, default "split_alt"
 #' @param python_path Character, path to Python executable, default NULL (uses GLUEDOCK_PYTHON_PATH environment variable)
 #' @param script_path Character, path to the splitting script, default NULL (uses GLUEDOCK_PREPARE_SPLIT_ALT environment variable)
 #' @param keep_label Character, alternate location label to keep, default "A"
@@ -14,11 +14,11 @@
 #' @examples
 #' \dontrun{
 #' # Process a single PDB file
-#' split_alt("protein.pdb", out_dir = "processed")
+#' split_alt("protein.pdb", output_dir = "processed")
 #' }
 #' @export
 split_alt <- function(inputs,
-                      out_dir = "split_alt",
+                      output_dir = "split_alt",
                       python_path = NULL,
                       script_path = NULL,
                       keep_label = "A") {
@@ -47,12 +47,12 @@ split_alt <- function(inputs,
   pdbs <- collect_pdb_files(inputs)
   if (!length(pdbs)) stop("No PDB files found in inputs.")
 
-  if (!dir.exists(out_dir)) {
-    dir.create(out_dir, recursive = TRUE)
-    message("Created output directory: ", out_dir)
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+    message("Created output directory: ", output_dir)
   }
 
-  kept <- process_pdb_files(pdbs, out_dir, python_path, script_path, keep_label)
+  kept <- process_pdb_files(pdbs, output_dir, python_path, script_path, keep_label)
 
   invisible(kept)
 }
@@ -101,20 +101,20 @@ has_alternate_locations <- function(pdb_file) {
 #' Process PDB files for alternate location splitting
 #'
 #' @param pdbs Character vector of PDB file paths
-#' @param out_dir Output directory
+#' @param output_dir Output directory
 #' @param python_path Path to Python executable
 #' @param script_path Path to splitting script
 #' @param keep_label Label to keep (default "A")
 #' @return Character vector of processed file paths
 #' @keywords internal
-process_pdb_files <- function(pdbs, out_dir, python_path, script_path, keep_label) {
+process_pdb_files <- function(pdbs, output_dir, python_path, script_path, keep_label) {
   kept <- character(0)
 
   for (pdb in pdbs) {
     stem <- tools::file_path_sans_ext(basename(pdb))
     message("Processing: ", basename(pdb))
 
-    out_file <- file.path(out_dir, paste0(stem, "_", keep_label, ".pdb"))
+    out_file <- file.path(output_dir, paste0(stem, "_", keep_label, ".pdb"))
 
     if (!has_alternate_locations(pdb)) {
       file.copy(pdb, out_file, overwrite = TRUE)
@@ -123,7 +123,7 @@ process_pdb_files <- function(pdbs, out_dir, python_path, script_path, keep_labe
       next
     }
 
-    kept <- c(kept, split_pdb_with_script(pdb, out_dir, stem, python_path, script_path, out_file, keep_label))
+    kept <- c(kept, split_pdb_with_script(pdb, output_dir, stem, python_path, script_path, out_file, keep_label))
   }
 
   return(kept)
@@ -132,7 +132,7 @@ process_pdb_files <- function(pdbs, out_dir, python_path, script_path, keep_labe
 #' Split PDB file with external Python script
 #'
 #' @param pdb_file Path to PDB file
-#' @param out_dir Output directory
+#' @param output_dir Output directory
 #' @param stem File stem name
 #' @param python_path Path to Python executable
 #' @param script_path Path to splitting script
@@ -140,8 +140,8 @@ process_pdb_files <- function(pdbs, out_dir, python_path, script_path, keep_labe
 #' @param keep_label Label to keep
 #' @return Character vector with path to processed file if successful
 #' @keywords internal
-split_pdb_with_script <- function(pdb_file, out_dir, stem, python_path, script_path, out_file, keep_label) {
-  prefix <- file.path(out_dir, stem)
+split_pdb_with_script <- function(pdb_file, output_dir, stem, python_path, script_path, out_file, keep_label) {
+  prefix <- file.path(output_dir, stem)
   prefix_norm <- normalizePath(prefix, winslash = "/", mustWork = FALSE)
   args <- c("-r", normalizePath(pdb_file, winslash = "/", mustWork = TRUE),
             "-o", prefix_norm)

@@ -8,8 +8,8 @@
 #' @param size Numeric vector of length 3 for box size (x,y,z) (only for direct mode)
 #' @param config_paths Character vector of paths to config files or directories containing config files
 #' @param exhaustiveness Integer, search intensity, default 8 (only for direct mode)
-#' @param out Character, output directory for docked files, default "docked"
-#' @param logs Character, output directory for log files, default "logs"
+#' @param output_dir Character, output directory for docked files, default "docked"
+#' @param logs_dir Character, output directory for log files, default "logs"
 #' @param vina_path Character, path to vina executable, default NULL
 #' @param seed Integer, random seed for reproducibility, default 12345
 #' @param cpu Integer, number of CPU cores to use for parallel computation, default NULL (auto-detect)
@@ -19,14 +19,14 @@
 #' # Run molecular docking using AutoDock Vina
 #' run_vina(
 #'   config_paths = "configs",
-#'   out = "docked",
-#'   logs = "logs"
+#'   output_dir = "docked",
+#'   logs_dir = "logs"
 #' )
 #' }
 #' @export
 run_vina <- function(receptor = NULL, ligand = NULL, center = NULL, size = NULL,
-                     config_paths = NULL, exhaustiveness = 8, out = "docked",
-                     logs = "logs", vina_path = NULL, seed = 12345, cpu = NULL) {
+                     config_paths = NULL, exhaustiveness = 8, output_dir = "docked",
+                     logs_dir = "logs", vina_path = NULL, seed = 12345, cpu = NULL) {
 
   if (!is.null(cpu)) {
     if (!is.numeric(cpu) || cpu != as.integer(cpu) || cpu <= 0) {
@@ -77,19 +77,19 @@ run_vina <- function(receptor = NULL, ligand = NULL, center = NULL, size = NULL,
       }
     }
 
-    if (!dir.exists(out)) {
-      dir.create(out, recursive = TRUE)
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
     }
 
-    if (!dir.exists(logs)) {
-      dir.create(logs, recursive = TRUE)
+    if (!dir.exists(logs_dir)) {
+      dir.create(logs_dir, recursive = TRUE)
     }
 
     rec_id <- tolower(tools::file_path_sans_ext(basename(receptor)))
     lig_id <- tolower(tools::file_path_sans_ext(basename(ligand)))
 
-    out_file <- file.path(out, paste0(rec_id, "_", lig_id, ".pdbqt"))
-    log_file <- file.path(logs, paste0(rec_id, "_", lig_id, "_log.txt"))
+    out_file <- file.path(output_dir, paste0(rec_id, "_", lig_id, ".pdbqt"))
+    log_file <- file.path(logs_dir, paste0(rec_id, "_", lig_id, "_log.txt"))
 
     cmd <- sprintf(
       "%s --receptor %s --ligand %s --center_x %f --center_y %f --center_z %f --size_x %f --size_y %f --size_z %f --exhaustiveness %d --out %s --seed %d --log %s",
@@ -149,12 +149,12 @@ run_vina <- function(receptor = NULL, ligand = NULL, center = NULL, size = NULL,
       }
     }
 
-    if (!dir.exists(out)) {
-      dir.create(out, recursive = TRUE)
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
     }
 
-    if (!dir.exists(logs)) {
-      dir.create(logs, recursive = TRUE)
+    if (!dir.exists(logs_dir)) {
+      dir.create(logs_dir, recursive = TRUE)
     }
 
     results <- list()
@@ -165,8 +165,8 @@ run_vina <- function(receptor = NULL, ligand = NULL, center = NULL, size = NULL,
       config_base <- tools::file_path_sans_ext(basename(config_file))
       config_base <- sub("_config$", "", config_base)  # Remove _config suffix if present
 
-      out_file <- file.path(out, paste0(config_base, ".pdbqt"))
-      log_file <- file.path(logs, paste0(config_base, "_log.txt"))
+      out_file <- file.path(output_dir, paste0(config_base, ".pdbqt"))
+      log_file <- file.path(logs_dir, paste0(config_base, "_log.txt"))
 
       cmd <- sprintf(
         "%s --config %s --out %s --seed %d --log %s",
@@ -200,8 +200,8 @@ run_vina <- function(receptor = NULL, ligand = NULL, center = NULL, size = NULL,
 
 #' Check docking log files and rerun failed docking jobs
 #'
-#' @param logs Character, directory containing log files, default "logs"
-#' @param out Character, output directory for docked files, default "docked"
+#' @param logs_dir Character, directory containing log files, default "logs"
+#' @param output_dir Character, output directory for docked files, default "docked"
 #' @param config_paths Character vector of paths to config files or directories containing config files
 #' @param vina_path Character, path to vina executable, default "vina"
 #' @param seed Integer, random seed for reproducibility, default 12345
@@ -213,20 +213,21 @@ run_vina <- function(receptor = NULL, ligand = NULL, center = NULL, size = NULL,
 #' \dontrun{
 #' # Check log files and rerun any failed docking jobs
 #' check_logs(
-#'   logs = "logs",
-#'   out = "docked",
+#'   logs_dir = "logs",
+#'   output_dir = "docked",
 #'   config_paths = "configs"
 #' )
 #' }
 #' @export
-check_logs <- function(logs = "logs", out = "docked", config_paths = NULL,
+check_logs <- function(logs_dir = "logs", output_dir = "docked", config_paths = NULL,
                        vina_path = NULL, seed = 12345, cpu = NULL, force = FALSE) {
-  if (!dir.exists(logs)) {
-    warning(sprintf("Log directory does not exist: %s", logs))
+  
+  if (!dir.exists(logs_dir)) {
+    warning(sprintf("Log directory does not exist: %s", logs_dir))
     return(invisible(NULL))
   }
 
-  log_files <- list.files(path = logs, pattern = "\\.txt$", full.names = TRUE)
+  log_files <- list.files(path = logs_dir, pattern = "\\.txt$", full.names = TRUE)
 
   if (length(log_files) == 0) {
     message("No log files found in directory: ", logs)
@@ -303,8 +304,8 @@ check_logs <- function(logs = "logs", out = "docked", config_paths = NULL,
     message(sprintf("Rerunning %d docking jobs...", length(rerun_configs)))
     run_vina(
       config_paths = rerun_configs,
-      out = out,
-      logs = logs,
+      output_dir = output_dir,
+      logs_dir = logs_dir,
       vina_path = vina_path,
       seed = seed,
       cpu = cpu

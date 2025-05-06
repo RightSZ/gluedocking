@@ -4,12 +4,12 @@
 \alias{process_pdb_files}
 \title{Process PDB files for alternate location splitting}
 \usage{
-process_pdb_files(pdbs, out_dir, python_path, script_path, keep_label)
+process_pdb_files(pdbs, output_dir, python_path, script_path, keep_label)
 }
 \arguments{
 \item{pdbs}{Character vector of PDB file paths}
 
-\item{out_dir}{Output directory}
+\item{output_dir}{Output directory}
 
 \item{python_path}{Path to Python executable}
 

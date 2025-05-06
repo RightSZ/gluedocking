@@ -4,12 +4,12 @@
 \alias{download_ligand}
 \title{Download ligand structures from PubChem}
 \usage{
-download_ligand(cids, out_dir = "ligands", verify_ssl = TRUE)
+download_ligand(cids, output_dir = "ligands", verify_ssl = TRUE)
 }
 \arguments{
 \item{cids}{Character vector of PubChem Compound IDs (CIDs) to download}
 
-\item{out_dir}{Character, output directory for downloaded files, default "ligands"}
+\item{output_dir}{Character, output directory for downloaded files, default "ligands"}
 
 \item{verify_ssl}{Logical, whether to verify SSL certificates, default TRUE}
 }
@@ -21,7 +21,7 @@ This function downloads chemical compound structures from PubChem database using
 }
 \examples{
 \dontrun{
-files <- download_ligand(c("2244", "5090"), out_dir = "compounds")
+files <- download_ligand(c("2244", "5090"), output_dir = "compounds")
 }
 
 }

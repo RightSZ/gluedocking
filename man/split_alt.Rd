@@ -6,7 +6,7 @@
 \usage{
 split_alt(
   inputs,
-  out_dir = "split_alt",
+  output_dir = "split_alt",
   python_path = NULL,
   script_path = NULL,
   keep_label = "A"
@@ -15,7 +15,7 @@ split_alt(
 \arguments{
 \item{inputs}{Character vector of file paths or directories containing PDB files}
 
-\item{out_dir}{Character, output directory for processed files, default "split_alt"}
+\item{output_dir}{Character, output directory for processed files, default "split_alt"}
 
 \item{python_path}{Character, path to Python executable, default NULL (uses GLUEDOCK_PYTHON_PATH environment variable)}
 
@@ -34,6 +34,6 @@ removing others. It uses an external Python script to perform the splitting.
 \examples{
 \dontrun{
 # Process a single PDB file
-split_alt("protein.pdb", out_dir = "processed")
+split_alt("protein.pdb", output_dir = "processed")
 }
 }

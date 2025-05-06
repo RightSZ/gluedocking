@@ -6,7 +6,7 @@
 \usage{
 prepare_receptor(
   pdb_files,
-  out_dir = "./",
+  output_dir = "./",
   python_path = NULL,
   prepare_script = NULL,
   add_opts = "-A hydrogens"
@@ -15,7 +15,7 @@ prepare_receptor(
 \arguments{
 \item{pdb_files}{Character vector of paths to PDB files}
 
-\item{out_dir}{Character, output directory for prepared files, default "./"}
+\item{output_dir}{Character, output directory for prepared files, default "./"}
 
 \item{python_path}{Character, path to Python executable, default "python"}
 
@@ -33,7 +33,7 @@ converting them to PDBQT format using AutoDock Tools scripts.
 \examples{
 \dontrun{
 pdbqt_files <- prepare_receptor(pdb_files,
-                                out_dir = "prepared",
+                                output_dir = "prepared",
                                 prepare_script = "path/to/prepare_receptor4.py")
 }
 

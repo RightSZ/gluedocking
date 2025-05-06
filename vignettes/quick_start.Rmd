@@ -79,13 +79,13 @@ trimmed_files<-trim_receptor("./receptors/", output_dir = "trimmed")
 # Step 2: Split alternate conformations (if present)
 pbd_files<-split_alt(
   inputs = trimmed_files,
-  out_dir = "split_alt",
+  output_dir = "split_alt",
   keep_label = "A"  # Keep only the "A" conformation
 )
 # Step 3: Convert PDB files to PDBQT format for docking
 receptor_pdbqt <- prepare_receptor(
   pbd_files,
-  out_dir = "prepared_receptors"
+  output_dir = "prepared_receptors"
 )
 ```
 
@@ -110,7 +110,7 @@ converted_files <- convert_molecule(
 # Step 2: Convert ligand files to PDBQT format for docking
 ligand_pdbqt <- prepare_ligand(
   converted_files,
-  out_dir = "prepared_ligands"
+  output_dir = "prepared_ligands"
 )
 ```
 
@@ -141,7 +141,7 @@ config_files <- write_configs(
   receptor_paths = receptor_pdbqt,
   ligand_paths = ligand_pdbqt,
   box_df = box_params,
-  out_dir = "configs",
+  output_dir = "configs",
   exhaustiveness = 8,  # Search thoroughness
 )
 ```
@@ -160,8 +160,8 @@ Now we're ready to perform the actual docking simulations:
 # Run molecular docking using AutoDock Vina
 results <- run_vina(
   config_paths = "configs",
-  out_dir = "docked",
-  log_dir = "logs",
+  output_dir = "docked",
+  logs_dir = "logs",
   cpu = 4  # Use 4 CPU cores
 )
 ```
@@ -175,8 +175,8 @@ Sometimes docking jobs may fail, so we can check and rerun them:
 ``` r
 # Check log files and rerun any failed docking jobs
 check_logs(
-  logs = "logs",
-  out = "docked",
+  logs_dir = "logs",
+  output_dir = "docked",
   config_paths = "configs"
 )
 ```

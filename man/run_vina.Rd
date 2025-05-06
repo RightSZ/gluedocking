@@ -11,8 +11,8 @@ run_vina(
   size = NULL,
   config_paths = NULL,
   exhaustiveness = 8,
-  out = "docked",
-  logs = "logs",
+  output_dir = "docked",
+  logs_dir = "logs",
   vina_path = NULL,
   seed = 12345,
   cpu = NULL
@@ -31,9 +31,9 @@ run_vina(
 
 \item{exhaustiveness}{Integer, search intensity, default 8 (only for direct mode)}
 
-\item{out}{Character, output directory for docked files, default "docked"}
+\item{output_dir}{Character, output directory for docked files, default "docked"}
 
-\item{logs}{Character, output directory for log files, default "logs"}
+\item{logs_dir}{Character, output directory for log files, default "logs"}
 
 \item{vina_path}{Character, path to vina executable, default NULL}
 
@@ -49,8 +49,8 @@ This function runs molecular docking using AutoDock Vina.
 # Run molecular docking using AutoDock Vina
 run_vina(
   config_paths = "configs",
-  out = "docked",
-  logs = "logs"
+  output_dir = "docked",
+  logs_dir = "logs"
 )
 }
 }
