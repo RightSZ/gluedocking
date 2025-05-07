@@ -38,7 +38,7 @@ prepare_for_gluedocking(
   prepare_ligand_script = "/your_path/autodock/Lib/site-packages/AutoDockTools/Utilities24/prepare_ligand4.py",
   prepare_split_alt_script = "/your_path/autodock/Lib/site-packages/AutoDockTools/Utilities24/prepare_pdb_split_alt_confs.py",
   obabel_path = "/your_path/obabel.exe",
-  vina_path = "/your_path/qvinaw.exe"
+  vina_path = "/your_path/anaconda/Library/bin/qvinaw.exe"
 )
 ```
 
@@ -52,7 +52,7 @@ First, we need to obtain the receptor (protein) structures. The `download_recept
 
 ``` r
 # Download PDB files from RCSB PDB database
-pdb_files <- download_receptor(c("1iep", "4hg7"), out_dir = "receptors")
+pdb_files <- download_receptor(c("1iep", "4hg7"), output_dir = "receptors")
 ```
 
 This step downloads the 3D structures of proteins that will serve as receptors (targets) for our docking experiments. The PDB files contain atomic coordinates of the protein structures determined by experimental methods like X-ray crystallography or NMR.
@@ -63,7 +63,7 @@ Next, we need small molecules (ligands) to dock into our receptors. The `downloa
 
 ``` r
 # Download ligand structures from PubChem
-ligand_files <- download_ligand(c("2244", "5090"), out_dir = "ligands")
+ligand_files <- download_ligand(c("2244", "5090"), output_dir = "ligands")
 ```
 
 This step obtains the 3D structures of small molecules that will be docked into the binding sites of our receptor proteins. These compounds are potential drug candidates or known drugs that we want to study for their binding interactions.
@@ -125,7 +125,7 @@ Before docking, we need to define the search space (docking box) where the ligan
 
 ``` r
 # Determine appropriate docking box dimensions and center coordinates
-box_params <- calculate_box(split_files, padding = 5)
+box_params <- calculate_box(receptor_pdbqt, padding = 5)
 print(box_params)
 ```
 
@@ -142,7 +142,7 @@ config_files <- write_configs(
   ligand_paths = ligand_pdbqt,
   box_df = box_params,
   output_dir = "configs",
-  exhaustiveness = 8,  # Search thoroughness
+  exhaustiveness = 8  # Search thoroughness
 )
 ```
 
@@ -189,7 +189,7 @@ Finally, we'll analyze the docking results:
 
 ``` r
 # Parse all log files and combine results
-results_df <- parse_logs(log_dir = "logs")
+results_df <- parse_logs(logs_dir = "logs")
 
 # View top binding poses sorted by binding affinity
 top_results <- head(results_df[order(results_df$affinity_kcalmol), ])

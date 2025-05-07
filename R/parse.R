@@ -43,25 +43,25 @@ parse_qvina_log <- function(file_path) {
 
 #' Parse all log files in a directory and combine results
 #'
-#' @param log_folder Character, path to the directory containing log files, default "logs"
+#' @param logs_dir Character, path to the directory containing log files, default "logs"
 #' @param pattern Character, pattern to match log files, default "\\.txt$"
 #' @param verbose Logical, whether to print detailed messages, default TRUE
 #' @return A data frame containing combined docking results from all log files
 #' @examples
 #' \dontrun{
 #' # Parse all log files and combine results
-#' results <- parse_logs(log_folder = "logs")
+#' results <- parse_logs(logs_dir = "logs")
 #' }
 #' @export
-parse_logs <- function(log_folder = "logs", pattern = "\\.txt$", verbose = TRUE) {
-  if (!dir.exists(log_folder)) {
-    stop(sprintf("Log directory does not exist: %s", log_folder))
+parse_logs <- function(logs_dir = "logs", pattern = "\\.txt$", verbose = TRUE) {
+  if (!dir.exists(logs_dir)) {
+    stop(sprintf("Log directory does not exist: %s", logs_dir))
   }
 
-  log_files <- list.files(path = log_folder, pattern = pattern, full.names = TRUE)
+  log_files <- list.files(path = logs_dir, pattern = pattern, full.names = TRUE)
 
   if (length(log_files) == 0) {
-    warning(sprintf("No log files found in directory: %s", log_folder))
+    warning(sprintf("No log files found in directory: %s", logs_dir))
     return(NULL)
   }
 

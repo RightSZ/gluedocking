@@ -83,7 +83,7 @@ specifying the paths to the required external tools:</p>
 <span>  prepare_ligand_script <span class="op">=</span> <span class="st">"/your_path/autodock/Lib/site-packages/AutoDockTools/Utilities24/prepare_ligand4.py"</span>,</span>
 <span>  prepare_split_alt_script <span class="op">=</span> <span class="st">"/your_path/autodock/Lib/site-packages/AutoDockTools/Utilities24/prepare_pdb_split_alt_confs.py"</span>,</span>
 <span>  obabel_path <span class="op">=</span> <span class="st">"/your_path/obabel.exe"</span>,</span>
-<span>  vina_path <span class="op">=</span> <span class="st">"/your_path/qvinaw.exe"</span></span>
+<span>  vina_path <span class="op">=</span> <span class="st">"/your_path/anaconda/Library/bin/qvinaw.exe"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>This will store the paths in your R environment file, so you only
 need to run this once.</p>
@@ -99,7 +99,7 @@ need to run this once.</p>
 RCSB Protein Data Bank.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download PDB files from RCSB PDB database</span></span>
-<span><span class="va">pdb_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_receptor.html">download_receptor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1iep"</span>, <span class="st">"4hg7"</span><span class="op">)</span>, out_dir <span class="op">=</span> <span class="st">"receptors"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">pdb_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_receptor.html">download_receptor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1iep"</span>, <span class="st">"4hg7"</span><span class="op">)</span>, output_dir <span class="op">=</span> <span class="st">"receptors"</span><span class="op">)</span></span></code></pre></div>
 <p>This step downloads the 3D structures of proteins that will serve as
 receptors (targets) for our docking experiments. The PDB files contain
 atomic coordinates of the protein structures determined by experimental
@@ -113,7 +113,7 @@ The <code>download_ligand</code> function retrieves chemical structures
 from PubChem.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download ligand structures from PubChem</span></span>
-<span><span class="va">ligand_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_ligand.html">download_ligand</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2244"</span>, <span class="st">"5090"</span><span class="op">)</span>, out_dir <span class="op">=</span> <span class="st">"ligands"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">ligand_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_ligand.html">download_ligand</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2244"</span>, <span class="st">"5090"</span><span class="op">)</span>, output_dir <span class="op">=</span> <span class="st">"ligands"</span><span class="op">)</span></span></code></pre></div>
 <p>This step obtains the 3D structures of small molecules that will be
 docked into the binding sites of our receptor proteins. These compounds
 are potential drug candidates or known drugs that we want to study for
@@ -181,7 +181,7 @@ partial charges, atom types, and setting up rotatable bonds</li>
 where the ligand will be positioned:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Determine appropriate docking box dimensions and center coordinates</span></span>
-<span><span class="va">box_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_box.html">calculate_box</a></span><span class="op">(</span><span class="va">split_files</span>, padding <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="va">box_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_box.html">calculate_box</a></span><span class="op">(</span><span class="va">receptor_pdbqt</span>, padding <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">box_params</span><span class="op">)</span></span></code></pre></div>
 <p>This step analyzes the receptor structures to determine the optimal
 dimensions and center coordinates for the docking box. The padding
@@ -199,7 +199,7 @@ binding site is included in the search space.</p>
 <span>  ligand_paths <span class="op">=</span> <span class="va">ligand_pdbqt</span>,</span>
 <span>  box_df <span class="op">=</span> <span class="va">box_params</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="st">"configs"</span>,</span>
-<span>  exhaustiveness <span class="op">=</span> <span class="fl">8</span>,  <span class="co"># Search thoroughness</span></span>
+<span>  exhaustiveness <span class="op">=</span> <span class="fl">8</span>  <span class="co"># Search thoroughness</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>This step generates configuration files that specify all parameters
 for the docking runs, including:</p>
@@ -249,7 +249,7 @@ pairs are successfully processed.</p>
 <p>Finally, we’ll analyze the docking results:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Parse all log files and combine results</span></span>
-<span><span class="va">results_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_logs.html">parse_logs</a></span><span class="op">(</span>log_dir <span class="op">=</span> <span class="st">"logs"</span><span class="op">)</span></span>
+<span><span class="va">results_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_logs.html">parse_logs</a></span><span class="op">(</span>logs_dir <span class="op">=</span> <span class="st">"logs"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View top binding poses sorted by binding affinity</span></span>
 <span><span class="va">top_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results_df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">results_df</span><span class="op">$</span><span class="va">affinity_kcalmol</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span>

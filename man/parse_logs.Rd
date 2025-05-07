@@ -4,10 +4,10 @@
 \alias{parse_logs}
 \title{Parse all log files in a directory and combine results}
 \usage{
-parse_logs(log_folder = "logs", pattern = "\\\\.txt$", verbose = TRUE)
+parse_logs(logs_dir = "logs", pattern = "\\\\.txt$", verbose = TRUE)
 }
 \arguments{
-\item{log_folder}{Character, path to the directory containing log files, default "logs"}
+\item{logs_dir}{Character, path to the directory containing log files, default "logs"}
 
 \item{pattern}{Character, pattern to match log files, default "\\.txt$"}
 
@@ -22,6 +22,6 @@ Parse all log files in a directory and combine results
 \examples{
 \dontrun{
 # Parse all log files and combine results
-results <- parse_logs(log_folder = "logs")
+results <- parse_logs(logs_dir = "logs")
 }
 }
